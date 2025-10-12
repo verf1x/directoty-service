@@ -17,17 +17,22 @@ public class Position
         CreatedAt = DateTime.UtcNow;
     }
 
-    public PositionId Id { get; }
+    // EF Core
+    private Position()
+    {
+    }
 
-    public PositionName Name { get; private set; }
+    public PositionId Id { get; } = null!;
 
-    public Description Description { get; private set; }
+    public PositionName Name { get; private set; } = null!;
+
+    public Description Description { get; private set; } = null!;
 
     public bool IsActive { get; private set; }
 
     public DateTime CreatedAt { get; }
 
-    public DateTime UpdatedAt { get; private set; }
+    public DateTime? UpdatedAt { get; private set; }
 
     public IReadOnlyList<DepartmentPosition> DepartmentPositions => _departmentPositions.AsReadOnly();
 }
