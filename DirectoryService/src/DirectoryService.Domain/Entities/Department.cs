@@ -27,7 +27,12 @@ public class Department
         CreatedAt = DateTime.UtcNow;
     }
 
-    public DepartmentId Id { get; private set; }
+    // EF Core
+    private Department()
+    {
+    }
+
+    public DepartmentId Id { get; private set; } = null!;
 
     public DepartmentName Name { get; private set; } = null!;
 
@@ -43,7 +48,7 @@ public class Department
 
     public DateTime CreatedAt { get; private set; }
 
-    public DateTime UpdatedAt { get; private set; }
+    public DateTime? UpdatedAt { get; private set; }
 
     public IReadOnlyList<DepartmentLocation> DepartmentLocations => _departmentLocations.AsReadOnly();
 

@@ -19,19 +19,24 @@ public class Location
         CreatedAt = DateTime.UtcNow;
     }
 
-    public LocationId Id { get; }
+    // EF Core
+    private Location()
+    {
+    }
 
-    public LocationName Name { get; private set; }
+    public LocationId Id { get; } = null!;
 
-    public Address Address { get; private set; }
+    public LocationName Name { get; private set; } = null!;
 
-    public TimeZone TimeZone { get; private set; }
+    public Address Address { get; private set; } = null!;
+
+    public TimeZone TimeZone { get; private set; } = null!;
 
     public bool IsActive { get; private set; }
 
     public DateTime CreatedAt { get; }
 
-    public DateTime UpdatedAt { get; private set; }
+    public DateTime? UpdatedAt { get; private set; }
 
     public IReadOnlyList<DepartmentLocation> DepartmentLocations => _departmentLocations.AsReadOnly();
 }
