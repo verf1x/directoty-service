@@ -13,7 +13,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace DirectoryService.Infrastructure.Migrations
 {
     [DbContext(typeof(DirectoryServiceDbContext))]
-    [Migration("20251012084127_Initial")]
+    [Migration("20251012123939_Initial")]
     partial class Initial
     {
         /// <inheritdoc />
@@ -125,7 +125,8 @@ namespace DirectoryService.Infrastructure.Migrations
                                 .HasColumnName("time_zone");
                         });
 
-                    b.HasKey("Id");
+                    b.HasKey("Id")
+                        .HasName("pk_locations");
 
                     b.ToTable("locations", (string)null);
                 });
@@ -168,13 +169,18 @@ namespace DirectoryService.Infrastructure.Migrations
                                 .HasColumnName("name");
                         });
 
-                    b.HasKey("Id");
+                    b.HasKey("Id")
+                        .HasName("pk_positions");
 
                     b.ToTable("positions", (string)null);
                 });
 
             modelBuilder.Entity("DirectoryService.Domain.Shared.Entities.DepartmentLocation", b =>
                 {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
+
                     b.Property<Guid>("DepartmentId")
                         .HasColumnType("uuid")
                         .HasColumnName("department_id");
@@ -183,7 +189,10 @@ namespace DirectoryService.Infrastructure.Migrations
                         .HasColumnType("uuid")
                         .HasColumnName("location_id");
 
-                    b.HasKey("DepartmentId", "LocationId");
+                    b.HasKey("Id")
+                        .HasName("pk_department_locations");
+
+                    b.HasIndex("DepartmentId");
 
                     b.HasIndex("LocationId");
 
@@ -192,6 +201,10 @@ namespace DirectoryService.Infrastructure.Migrations
 
             modelBuilder.Entity("DirectoryService.Domain.Shared.Entities.DepartmentPosition", b =>
                 {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
+
                     b.Property<Guid>("DepartmentId")
                         .HasColumnType("uuid")
                         .HasColumnName("department_id");
@@ -200,7 +213,10 @@ namespace DirectoryService.Infrastructure.Migrations
                         .HasColumnType("uuid")
                         .HasColumnName("position_id");
 
-                    b.HasKey("DepartmentId", "PositionId");
+                    b.HasKey("Id")
+                        .HasName("pk_department_positions");
+
+                    b.HasIndex("DepartmentId");
 
                     b.HasIndex("PositionId");
 

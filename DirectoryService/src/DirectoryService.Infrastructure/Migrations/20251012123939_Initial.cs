@@ -44,7 +44,7 @@ namespace DirectoryService.Infrastructure.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_locations", x => x.Id);
+                    table.PrimaryKey("pk_locations", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -60,19 +60,20 @@ namespace DirectoryService.Infrastructure.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_positions", x => x.Id);
+                    table.PrimaryKey("pk_positions", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
                 name: "department_locations",
                 columns: table => new
                 {
+                    id = table.Column<Guid>(type: "uuid", nullable: false),
                     department_id = table.Column<Guid>(type: "uuid", nullable: false),
                     location_id = table.Column<Guid>(type: "uuid", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_department_locations", x => new { x.department_id, x.location_id });
+                    table.PrimaryKey("pk_department_locations", x => x.id);
                     table.ForeignKey(
                         name: "FK_department_locations_departments_department_id",
                         column: x => x.department_id,
@@ -91,12 +92,13 @@ namespace DirectoryService.Infrastructure.Migrations
                 name: "department_positions",
                 columns: table => new
                 {
+                    id = table.Column<Guid>(type: "uuid", nullable: false),
                     department_id = table.Column<Guid>(type: "uuid", nullable: false),
                     position_id = table.Column<Guid>(type: "uuid", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_department_positions", x => new { x.department_id, x.position_id });
+                    table.PrimaryKey("pk_department_positions", x => x.id);
                     table.ForeignKey(
                         name: "FK_department_positions_departments_department_id",
                         column: x => x.department_id,
@@ -112,9 +114,19 @@ namespace DirectoryService.Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateIndex(
+                name: "IX_department_locations_department_id",
+                table: "department_locations",
+                column: "department_id");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_department_locations_location_id",
                 table: "department_locations",
                 column: "location_id");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_department_positions_department_id",
+                table: "department_positions",
+                column: "department_id");
 
             migrationBuilder.CreateIndex(
                 name: "IX_department_positions_position_id",

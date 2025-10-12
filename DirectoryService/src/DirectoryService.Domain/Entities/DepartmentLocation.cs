@@ -1,6 +1,7 @@
 using DirectoryService.Domain.Entities;
 using DirectoryService.Domain.EntityIds;
 using DirectoryService.Domain.LocationsManagement.Entities;
+using DirectoryService.Domain.ValueObjects;
 
 namespace DirectoryService.Domain.Shared.Entities;
 
@@ -8,6 +9,7 @@ public class DepartmentLocation
 {
     public DepartmentLocation(DepartmentId departmentId, LocationId locationId)
     {
+        Id = DepartmentLocationId.CreateNew();
         DepartmentId = departmentId;
         LocationId = locationId;
     }
@@ -16,6 +18,8 @@ public class DepartmentLocation
     private DepartmentLocation()
     {
     }
+
+    public DepartmentLocationId Id { get; private set; } = null!;
 
     public Department Department { get; private set; } = null!;
 

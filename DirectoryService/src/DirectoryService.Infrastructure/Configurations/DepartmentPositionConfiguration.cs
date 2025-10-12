@@ -1,5 +1,6 @@
 using DirectoryService.Domain.EntityIds;
 using DirectoryService.Domain.Shared.Entities;
+using DirectoryService.Domain.ValueObjects;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -11,7 +12,14 @@ public class DepartmentPositionConfiguration : IEntityTypeConfiguration<Departme
     {
         builder.ToTable("department_positions");
 
-        builder.HasKey(dp => new { dp.DepartmentId, dp.PositionId });
+        builder.HasKey(dp => dp.Id).HasName("pk_department_positions");
+
+        builder.Property(dp => dp.Id)
+            .HasConversion(
+                id => id.Value,
+                value => DepartmentPositionId.Create(value))
+            .HasColumnName("id")
+            .IsRequired();
 
         builder.Property(dp => dp.DepartmentId)
             .HasConversion(
