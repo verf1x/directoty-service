@@ -1,8 +1,7 @@
 using System.Text.RegularExpressions;
 using CSharpFunctionalExtensions;
-using DirectoryService.Domain.Shared;
 
-namespace DirectoryService.Domain.DepartmentsManagement.ValueObjects;
+namespace DirectoryService.Domain.ValueObjects;
 
 public sealed class Identifier : ComparableValueObject
 {

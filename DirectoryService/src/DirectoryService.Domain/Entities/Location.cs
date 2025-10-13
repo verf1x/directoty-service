@@ -1,9 +1,8 @@
 using DirectoryService.Domain.EntityIds;
-using DirectoryService.Domain.LocationsManagement.ValueObjects;
-using DirectoryService.Domain.Shared.Entities;
-using TimeZone = DirectoryService.Domain.LocationsManagement.ValueObjects.TimeZone;
+using DirectoryService.Domain.ValueObjects;
+using TimeZone = DirectoryService.Domain.ValueObjects.TimeZone;
 
-namespace DirectoryService.Domain.LocationsManagement.Entities;
+namespace DirectoryService.Domain.Entities;
 
 public class Location
 {

@@ -1,7 +1,8 @@
+using DirectoryService.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
-namespace DirectoryService.Infrastructure;
+namespace DirectoryService.Infrastructure.Postgres;
 
 public class DirectoryServiceDbContext : DbContext
 {
@@ -11,6 +12,8 @@ public class DirectoryServiceDbContext : DbContext
     {
         _connectionString = connectionString;
     }
+
+    public DbSet<Location> Locations => Set<Location>();
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
