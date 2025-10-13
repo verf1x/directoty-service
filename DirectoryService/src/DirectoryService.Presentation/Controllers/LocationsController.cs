@@ -10,7 +10,7 @@ namespace DirectoryService.Presentation.Controllers;
 public class LocationsController : ControllerBase
 {
     [HttpPost]
-    public IActionResult CreateAsync(
+    public async Task<IActionResult> CreateAsync(
         [FromBody] CreateLocationRequest request,
         [FromServices] ICommandHandler<CreateLocationCommand, Guid> handler,
         CancellationToken cancellationToken)
@@ -24,8 +24,7 @@ public class LocationsController : ControllerBase
             request.CountryCode,
             request.TimeZone);
 
-        var result = handler.HandleAsync(command, cancellationToken).GetAwaiter().GetResult();
-
-        return result.IsSuccess ? Ok(command) : BadRequest(result.Error);
+        var result = await handler.HandleAsync(command, cancellationToken);
+        return result.IsSuccess ? Ok(result.Value) : BadRequest(result.Error);
     }
 }
