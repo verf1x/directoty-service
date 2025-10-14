@@ -4,6 +4,8 @@ namespace DirectoryService.Domain;
 
 public record Error
 {
+    private const string Separator = "||";
+
     public string Code { get; }
 
     public string Message { get; }
@@ -33,7 +35,41 @@ public record Error
     public static Error Failure(string? code, string message)
         => new Error(code ?? "failure", message, ErrorType.Failure);
 
-    public ErrorsList ToErrors() => this;
+    public string Serialize() => string.Join(Separator, Code, Message, Type);
+
+    public static Error Deserialize(string serialized)
+    {
+        string[] parts = serialized.Split(Separator);
+
+        return parts.Length < 2 || !Enum.TryParse(parts[2], out ErrorType type)
+            ? throw new ArgumentException("Invalid serialized format")
+            : new Error(parts[0], parts[1], type);
+    }
+
+    public ErrorList ToErrors() => this;
+}
+
+public record Envelope<T>
+{
+    public T? Result { get; }
+
+    public ErrorList? Errors { get; }
+
+    public DateTime CreationDate { get; }
+
+    [JsonConstructor]
+    private Envelope(T? result, ErrorList? errors)
+    {
+        Result = result;
+        Errors = errors;
+        CreationDate = DateTime.Now;
+    }
+
+    public static Envelope<T> Ok(T? result = default)
+        => new(result, null);
+
+    public static Envelope<T> Error(ErrorList errors)
+        => new(default, errors);
 }
 
 public enum ErrorType

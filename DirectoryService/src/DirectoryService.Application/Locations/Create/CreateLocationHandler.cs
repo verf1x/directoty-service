@@ -22,7 +22,7 @@ public class CreateLocationHandler : ICommandHandler<CreateLocationCommand, Guid
         _locationsRepository = locationsRepository;
     }
 
-    public async Task<Result<Guid, ErrorsList>> HandleAsync(
+    public async Task<Result<Guid, ErrorList>> HandleAsync(
         CreateLocationCommand command,
         CancellationToken cancellationToken)
     {
