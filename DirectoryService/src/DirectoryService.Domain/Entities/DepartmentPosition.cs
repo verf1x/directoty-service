@@ -1,9 +1,7 @@
-using DirectoryService.Domain.Entities;
 using DirectoryService.Domain.EntityIds;
-using DirectoryService.Domain.PositionsManagement.Entities;
 using DirectoryService.Domain.ValueObjects;
 
-namespace DirectoryService.Domain.Shared.Entities;
+namespace DirectoryService.Domain.Entities;
 
 public class DepartmentPosition
 {

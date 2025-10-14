@@ -1,8 +1,7 @@
 using DirectoryService.Domain.EntityIds;
-using DirectoryService.Domain.PositionsManagement.ValueObjects;
-using DirectoryService.Domain.Shared.Entities;
+using DirectoryService.Domain.ValueObjects;
 
-namespace DirectoryService.Domain.PositionsManagement.Entities;
+namespace DirectoryService.Domain.Entities;
 
 public class Position
 {

@@ -3,7 +3,7 @@ using DirectoryService.Domain.EntityIds;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace DirectoryService.Infrastructure.Configurations;
+namespace DirectoryService.Infrastructure.Postgres.Configurations;
 
 public class DepartmentConfiguration : IEntityTypeConfiguration<Department>
 {

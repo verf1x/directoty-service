@@ -1,9 +1,7 @@
 ﻿using CSharpFunctionalExtensions;
-using DirectoryService.Domain.DepartmentsManagement.ValueObjects;
 using DirectoryService.Domain.EntityIds;
-using DirectoryService.Domain.Shared;
-using DirectoryService.Domain.Shared.Entities;
-using Path = DirectoryService.Domain.DepartmentsManagement.ValueObjects.Path;
+using DirectoryService.Domain.ValueObjects;
+using Path = DirectoryService.Domain.ValueObjects.Path;
 
 namespace DirectoryService.Domain.Entities;
 

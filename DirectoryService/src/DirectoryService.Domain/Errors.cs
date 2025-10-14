@@ -1,4 +1,4 @@
-namespace DirectoryService.Domain.Shared;
+namespace DirectoryService.Domain;
 
 public static class Errors
 {

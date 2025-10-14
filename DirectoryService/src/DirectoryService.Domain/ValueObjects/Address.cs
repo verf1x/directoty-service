@@ -1,13 +1,12 @@
 using System.Text.RegularExpressions;
 using CSharpFunctionalExtensions;
-using DirectoryService.Domain.Shared;
 
-namespace DirectoryService.Domain.LocationsManagement.ValueObjects;
+namespace DirectoryService.Domain.ValueObjects;
 
 public sealed class Address : ComparableValueObject
 {
-    public const int MinAddressLines = 2;
-    public const int MaxAddressLines = 4;
+    private const int MinAddressLines = 2;
+    private const int MaxAddressLines = 4;
 
     private Address(
         IReadOnlyList<string> addressLines,
@@ -34,7 +33,7 @@ public sealed class Address : ComparableValueObject
     public string CountryCode { get; }
 
     public static Result<Address, Error> Create(
-        IList<string> addressLines,
+        List<string> addressLines,
         string locality,
         string? region,
         string? postalCode,
@@ -49,7 +48,7 @@ public sealed class Address : ComparableValueObject
         if (string.IsNullOrWhiteSpace(countryCode) || !Regex.IsMatch(countryCode, @"^[A-Z]{2}$"))
             return Errors.General.ValueIsRequired(nameof(countryCode));
 
-        return new Address(addressLines.AsReadOnly(), locality, region, postalCode, countryCode);
+        return new Address(addressLines, locality, region, postalCode, countryCode);
     }
 
     public override string ToString()
