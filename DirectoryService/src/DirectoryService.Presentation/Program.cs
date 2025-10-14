@@ -1,10 +1,16 @@
 using DirectoryService.Application;
 using DirectoryService.Domain;
 using DirectoryService.Infrastructure.Postgres;
+using DirectoryService.Presentation.Extensions;
+using DirectoryService.Presentation.Middlewares;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.OpenApi.Models;
+using Serilog;
+using Serilog.Events;
 
 var builder = WebApplication.CreateBuilder(args);
+
+Log.Logger = LoggerConfigurationFactory.Create(builder.GetSeqConnectionString());
 
 builder.Services.AddControllers();
 
@@ -29,10 +35,15 @@ builder.Services.AddOpenApi(options =>
     });
 });
 
+builder.Services.AddSerilog();
+
 builder.Services.AddApplication();
 builder.Services.AddInfrastructure(builder.Configuration);
 
 var app = builder.Build();
+
+app.UseExceptionMiddleware();
+app.UseSerilogRequestLogging();
 
 if (app.Environment.IsDevelopment())
 {
