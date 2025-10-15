@@ -5,6 +5,7 @@ using DirectoryService.Domain;
 using DirectoryService.Domain.Entities;
 using DirectoryService.Domain.ValueObjects;
 using FluentValidation;
+using Microsoft.Extensions.Logging;
 using TimeZone = DirectoryService.Domain.ValueObjects.TimeZone;
 
 namespace DirectoryService.Application.Locations.Create;
@@ -13,13 +14,16 @@ public class CreateLocationHandler : ICommandHandler<CreateLocationCommand, Guid
 {
     private readonly IValidator<CreateLocationCommand> _validator;
     private readonly ILocationsRepository _locationsRepository;
+    private readonly ILogger<CreateLocationHandler> _logger;
 
     public CreateLocationHandler(
         IValidator<CreateLocationCommand> validator,
-        ILocationsRepository locationsRepository)
+        ILocationsRepository locationsRepository,
+        ILogger<CreateLocationHandler> logger)
     {
         _validator = validator;
         _locationsRepository = locationsRepository;
+        _logger = logger;
     }
 
     public async Task<Result<Guid, ErrorList>> HandleAsync(
@@ -46,6 +50,8 @@ public class CreateLocationHandler : ICommandHandler<CreateLocationCommand, Guid
         var addResult = await _locationsRepository.AddAsync(location, cancellationToken);
         if (addResult.IsFailure)
             return addResult.Error.ToErrors();
+
+        _logger.LogInformation("Location {LocationId} created", location.Id);
 
         return location.Id.Value;
     }
