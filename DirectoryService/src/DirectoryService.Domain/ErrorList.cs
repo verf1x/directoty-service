@@ -2,11 +2,11 @@
 
 namespace DirectoryService.Domain;
 
-public class ErrorsList : IEnumerable<Error>
+public class ErrorList : IEnumerable<Error>
 {
     private readonly List<Error> _errors;
 
-    public ErrorsList(IEnumerable<Error> errors)
+    public ErrorList(IEnumerable<Error> errors)
     {
         _errors = [.. errors];
     }
@@ -15,7 +15,7 @@ public class ErrorsList : IEnumerable<Error>
 
     IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
-    public static implicit operator ErrorsList(Error[] errors) => new(errors);
+    public static implicit operator ErrorList(Error[] errors) => new(errors);
 
-    public static implicit operator ErrorsList(Error error) => new([error]);
+    public static implicit operator ErrorList(Error error) => new([error]);
 }
