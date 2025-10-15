@@ -10,7 +10,7 @@ using TimeZone = DirectoryService.Domain.ValueObjects.TimeZone;
 
 namespace DirectoryService.Application.Locations.Create;
 
-public class CreateLocationHandler : ICommandHandler<CreateLocationCommand, Guid>
+public sealed class CreateLocationHandler : ICommandHandler<CreateLocationCommand, Guid>
 {
     private readonly IValidator<CreateLocationCommand> _validator;
     private readonly ILocationsRepository _locationsRepository;

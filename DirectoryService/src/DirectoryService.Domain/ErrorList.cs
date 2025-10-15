@@ -2,7 +2,7 @@
 
 namespace DirectoryService.Domain;
 
-public class ErrorList : IEnumerable<Error>
+public sealed class ErrorList : IEnumerable<Error>
 {
     private readonly List<Error> _errors;
 

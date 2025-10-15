@@ -1,8 +1,6 @@
-using DirectoryService.Domain.EntityIds;
+namespace DirectoryService.Domain.EntityIds;
 
-namespace DirectoryService.Domain.ValueObjects;
-
-public class DepartmentPositionId : EntityIdBase
+public sealed class DepartmentPositionId : EntityIdBase
 {
     private DepartmentPositionId(Guid value)
         : base(value)

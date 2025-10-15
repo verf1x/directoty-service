@@ -6,7 +6,7 @@ using Microsoft.Extensions.Logging;
 
 namespace DirectoryService.Infrastructure.Postgres.Repositories;
 
-public class EfCoreLocationsRepository : ILocationsRepository
+public sealed class EfCoreLocationsRepository : ILocationsRepository
 {
     private readonly DirectoryServiceDbContext _dbContext;
     private readonly ILogger<EfCoreLocationsRepository> _logger;

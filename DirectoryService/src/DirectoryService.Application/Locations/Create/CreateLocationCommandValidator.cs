@@ -2,7 +2,7 @@
 
 namespace DirectoryService.Application.Locations.Create;
 
-public class CreateLocationCommandValidator : AbstractValidator<CreateLocationCommand>
+public sealed class CreateLocationCommandValidator : AbstractValidator<CreateLocationCommand>
 {
     public CreateLocationCommandValidator()
     {

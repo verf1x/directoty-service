@@ -3,7 +3,7 @@ using DirectoryService.Presentation.Response;
 
 namespace DirectoryService.Presentation.Middlewares;
 
-public class ExceptionMiddleware
+public sealed class ExceptionMiddleware
 {
     private readonly ILogger<ExceptionMiddleware> _logger;
     private readonly RequestDelegate _next;

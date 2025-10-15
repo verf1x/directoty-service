@@ -4,7 +4,7 @@ using TimeZone = DirectoryService.Domain.ValueObjects.TimeZone;
 
 namespace DirectoryService.Domain.Entities;
 
-public class Location
+public sealed class Location
 {
     private readonly List<DepartmentLocation> _departmentLocations = [];
 

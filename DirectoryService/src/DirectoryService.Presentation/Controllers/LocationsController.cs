@@ -9,7 +9,7 @@ namespace DirectoryService.Presentation.Controllers;
 
 [ApiController]
 [Route("api/locations")]
-public class LocationsController : ControllerBase
+public sealed class LocationsController : ControllerBase
 {
     [HttpPost]
     [ProducesResponseType<Envelope<Guid>>(200)]

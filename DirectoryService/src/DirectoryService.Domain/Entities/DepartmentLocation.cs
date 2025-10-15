@@ -3,7 +3,7 @@ using DirectoryService.Domain.ValueObjects;
 
 namespace DirectoryService.Domain.Entities;
 
-public class DepartmentLocation
+public sealed class DepartmentLocation
 {
     public DepartmentLocation(DepartmentId departmentId, LocationId locationId)
     {
