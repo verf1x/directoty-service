@@ -6,11 +6,16 @@ using DirectoryService.Presentation.Middlewares;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.OpenApi.Models;
 using Serilog;
-using Serilog.Events;
 
 var builder = WebApplication.CreateBuilder(args);
 
-Log.Logger = LoggerConfigurationFactory.Create(builder.GetSeqConnectionString());
+builder.Host.UseSerilog((context, services, loggerConfig) =>
+{
+    string seqUrl = context.Configuration.GetConnectionString("Seq")
+                    ?? throw new InvalidOperationException("Seq connection string is not configured");
+
+    LoggerConfigurationFactory.Configure(loggerConfig, seqUrl);
+});
 
 builder.Services.AddControllers();
 
@@ -34,8 +39,6 @@ builder.Services.AddOpenApi(options =>
         return Task.CompletedTask;
     });
 });
-
-builder.Services.AddSerilog();
 
 builder.Services.AddApplication();
 builder.Services.AddInfrastructure(builder.Configuration);
