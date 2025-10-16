@@ -1,6 +1,7 @@
 ﻿using CSharpFunctionalExtensions;
+using DirectoryService.Domain.Shared;
 
-namespace DirectoryService.Domain.ValueObjects;
+namespace DirectoryService.Domain.Departments;
 
 public sealed class DepartmentName : ComparableValueObject
 {

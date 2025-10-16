@@ -1,9 +1,6 @@
-using DirectoryService.Domain.EntityIds;
-using DirectoryService.Domain.Locations;
-using DirectoryService.Domain.ValueObjects;
-using TimeZone = DirectoryService.Domain.ValueObjects.TimeZone;
+using DirectoryService.Domain.DepartmentLocations;
 
-namespace DirectoryService.Domain.Entities;
+namespace DirectoryService.Domain.Locations;
 
 public sealed class Location
 {

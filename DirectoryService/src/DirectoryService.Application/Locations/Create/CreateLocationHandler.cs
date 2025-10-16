@@ -1,13 +1,11 @@
 ﻿using CSharpFunctionalExtensions;
 using DirectoryService.Application.Abstractions;
-using DirectoryService.Application.Extensions;
-using DirectoryService.Domain;
-using DirectoryService.Domain.Entities;
+using DirectoryService.Application.Validation;
 using DirectoryService.Domain.Locations;
-using DirectoryService.Domain.ValueObjects;
+using DirectoryService.Domain.Shared;
 using FluentValidation;
 using Microsoft.Extensions.Logging;
-using TimeZone = DirectoryService.Domain.ValueObjects.TimeZone;
+using TimeZone = DirectoryService.Domain.Locations.TimeZone;
 
 namespace DirectoryService.Application.Locations.Create;
 
@@ -37,15 +35,35 @@ public sealed class CreateLocationHandler : ICommandHandler<CreateLocationComman
 
         var locationName = LocationName.Create(command.Name).Value;
 
+        var existingLocationByNameResult = await _locationsRepository
+            .GetByNameAsync(locationName, cancellationToken);
+
+        if (existingLocationByNameResult.IsSuccess)
+        {
+            return Error.Conflict(
+                "location.with.name.already.exists",
+                $"Location with name {command.Name} already exists").ToErrors();
+        }
+
         var address = Address.Create(
             command.PostalCode,
             command.Region,
-            command.District,
             command.City,
+            command.District,
             command.Street,
             command.House,
             command.Building,
             command.Apartment).Value;
+
+        var existingLocationByAddressResult = await _locationsRepository
+            .GetByAddressAsync(address, cancellationToken);
+
+        if (existingLocationByAddressResult.IsSuccess)
+        {
+            return Error.Conflict(
+                "location.with.address.already.exists",
+                $"Location on address {address} already exists").ToErrors();
+        }
 
         var timeZone = TimeZone.Create(command.TimeZone).Value;
 

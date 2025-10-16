@@ -1,4 +1,6 @@
-namespace DirectoryService.Domain.EntityIds;
+using DirectoryService.Domain.Shared;
+
+namespace DirectoryService.Domain.DepartmentPositions;
 
 public sealed class DepartmentPositionId : EntityIdBase
 {

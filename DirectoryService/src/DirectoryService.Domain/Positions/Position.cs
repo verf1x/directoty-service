@@ -1,7 +1,6 @@
-using DirectoryService.Domain.EntityIds;
-using DirectoryService.Domain.ValueObjects;
+using DirectoryService.Domain.DepartmentPositions;
 
-namespace DirectoryService.Domain.Entities;
+namespace DirectoryService.Domain.Positions;
 
 public sealed class Position
 {

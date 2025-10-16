@@ -1,5 +1,4 @@
-using DirectoryService.Domain.Entities;
-using DirectoryService.Domain.EntityIds;
+using DirectoryService.Domain.Locations;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -26,10 +25,8 @@ public sealed class LocationConfiguration : IEntityTypeConfiguration<Location>
                 .IsRequired();
         });
 
-        builder.OwnsOne(l => l.Address, ab =>
+        builder.ComplexProperty(l => l.Address, ab =>
         {
-            ab.ToJson("address");
-
             ab.Property(a => a.PostalCode)
                 .HasColumnName("postal_code")
                 .HasMaxLength(6)

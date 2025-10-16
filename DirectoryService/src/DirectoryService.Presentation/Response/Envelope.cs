@@ -1,5 +1,6 @@
 ﻿using System.Text.Json.Serialization;
 using DirectoryService.Domain;
+using DirectoryService.Domain.Shared;
 
 namespace DirectoryService.Presentation.Response;
 

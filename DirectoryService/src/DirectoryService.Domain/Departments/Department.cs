@@ -1,9 +1,9 @@
 ﻿using CSharpFunctionalExtensions;
-using DirectoryService.Domain.EntityIds;
-using DirectoryService.Domain.ValueObjects;
-using Path = DirectoryService.Domain.ValueObjects.Path;
+using DirectoryService.Domain.DepartmentLocations;
+using DirectoryService.Domain.DepartmentPositions;
+using DirectoryService.Domain.Shared;
 
-namespace DirectoryService.Domain.Entities;
+namespace DirectoryService.Domain.Departments;
 
 public sealed class Department
 {

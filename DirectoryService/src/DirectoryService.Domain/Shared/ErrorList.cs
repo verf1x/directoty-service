@@ -1,6 +1,6 @@
 ﻿using System.Collections;
 
-namespace DirectoryService.Domain;
+namespace DirectoryService.Domain.Shared;
 
 public sealed class ErrorList : IEnumerable<Error>
 {

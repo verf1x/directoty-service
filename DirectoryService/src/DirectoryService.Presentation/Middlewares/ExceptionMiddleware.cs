@@ -1,4 +1,5 @@
 ﻿using DirectoryService.Domain;
+using DirectoryService.Domain.Shared;
 using DirectoryService.Presentation.Response;
 
 namespace DirectoryService.Presentation.Middlewares;

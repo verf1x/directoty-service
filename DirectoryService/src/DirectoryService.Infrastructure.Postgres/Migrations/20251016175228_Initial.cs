@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
-namespace DirectoryService.Infrastructure.Migrations
+namespace DirectoryService.Infrastructure.Postgres.Migrations
 {
     /// <inheritdoc />
     public partial class Initial : Migration
@@ -38,9 +38,16 @@ namespace DirectoryService.Infrastructure.Migrations
                     is_active = table.Column<bool>(type: "boolean", nullable: false),
                     created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    apartment = table.Column<string>(type: "character varying(10)", maxLength: 10, nullable: true),
+                    building = table.Column<string>(type: "character varying(10)", maxLength: 10, nullable: true),
+                    city = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false),
+                    district = table.Column<string>(type: "character varying(150)", maxLength: 150, nullable: true),
+                    house = table.Column<string>(type: "character varying(10)", maxLength: 10, nullable: false),
+                    postal_code = table.Column<string>(type: "character varying(6)", maxLength: 6, nullable: false),
+                    region = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false),
+                    street = table.Column<string>(type: "character varying(150)", maxLength: 150, nullable: false),
                     name = table.Column<string>(type: "character varying(200)", maxLength: 200, nullable: false),
-                    time_zone = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false),
-                    address = table.Column<string>(type: "jsonb", nullable: false)
+                    time_zone = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false)
                 },
                 constraints: table =>
                 {

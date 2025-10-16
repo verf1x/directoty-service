@@ -1,6 +1,7 @@
 using CSharpFunctionalExtensions;
+using DirectoryService.Domain.Shared;
 
-namespace DirectoryService.Domain.ValueObjects;
+namespace DirectoryService.Domain.Locations;
 
 public sealed class LocationName : ComparableValueObject
 {
@@ -10,8 +11,11 @@ public sealed class LocationName : ComparableValueObject
 
     public static Result<LocationName, Error> Create(string value)
     {
-        if (string.IsNullOrWhiteSpace(value) || value.Length is < 3 or > 120)
-            return Errors.General.ValueIsInvalid(nameof(value));
+        if (string.IsNullOrWhiteSpace(value))
+            return Errors.Validation.CannotBeNullOrEmpty(nameof(value));
+
+        if (value.Length is < 3 or > 20)
+            return Errors.Validation.InvalidLength(nameof(value), 3, 20);
 
         return new LocationName(value);
     }

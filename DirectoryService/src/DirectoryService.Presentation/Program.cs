@@ -1,5 +1,5 @@
 using DirectoryService.Application;
-using DirectoryService.Domain;
+using DirectoryService.Domain.Shared;
 using DirectoryService.Infrastructure.Postgres;
 using DirectoryService.Presentation.Extensions;
 using DirectoryService.Presentation.Middlewares;

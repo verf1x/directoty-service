@@ -1,7 +1,9 @@
 ﻿using CSharpFunctionalExtensions;
 using DirectoryService.Application.Locations;
 using DirectoryService.Domain;
-using DirectoryService.Domain.Entities;
+using DirectoryService.Domain.Locations;
+using DirectoryService.Domain.Shared;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
 namespace DirectoryService.Infrastructure.Postgres.Repositories;
@@ -40,5 +42,29 @@ public sealed class EfCoreLocationsRepository : ILocationsRepository
                 "location.insert",
                 "An error occurred while adding the location to the database.");
         }
+    }
+
+    public async Task<Result<Location, Error>> GetByNameAsync(
+        LocationName locationName,
+        CancellationToken cancellationToken)
+    {
+        var location = await _dbContext.Locations
+            .FirstOrDefaultAsync(l => l.Name == locationName, cancellationToken);
+
+        if (location is null)
+            return Errors.General.NotFound();
+
+        return location;
+    }
+
+    public async Task<Result<Location, Error>> GetByAddressAsync(Address address, CancellationToken cancellationToken)
+    {
+        var location = await _dbContext.Locations
+            .FirstOrDefaultAsync(l => l.Address == address, cancellationToken);
+
+        if (location is null)
+            return Errors.General.NotFound();
+
+        return location;
     }
 }

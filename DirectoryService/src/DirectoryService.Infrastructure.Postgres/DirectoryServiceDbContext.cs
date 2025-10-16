@@ -1,6 +1,5 @@
-using DirectoryService.Domain.Entities;
+using DirectoryService.Domain.Locations;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
 
 namespace DirectoryService.Infrastructure.Postgres;
 

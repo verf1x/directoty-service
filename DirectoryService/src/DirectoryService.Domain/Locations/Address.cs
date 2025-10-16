@@ -1,4 +1,5 @@
 using CSharpFunctionalExtensions;
+using DirectoryService.Domain.Shared;
 
 namespace DirectoryService.Domain.Locations;
 
@@ -43,36 +44,39 @@ public sealed class Address : ComparableValueObject
     public static Result<Address, Error> Create(
         string postalCode,
         string region,
-        string? district,
         string city,
+        string? district,
         string street,
         string house,
         string? building,
         string? apartment)
     {
-        if (string.IsNullOrWhiteSpace(postalCode) || !IsValidPostalCode(postalCode))
-            return Errors.General.ValueIsInvalid(nameof(postalCode));
+        if (string.IsNullOrWhiteSpace(postalCode))
+            return Errors.Validation.CannotBeNullOrEmpty(nameof(postalCode));
+
+        if (!IsValidPostalCode(postalCode))
+            return Errors.Validation.InvalidExpectedLength(nameof(postalCode), 6);
 
         if (string.IsNullOrWhiteSpace(region))
-            return Errors.General.ValueIsInvalid(nameof(region));
+            return Errors.Validation.CannotBeNullOrEmpty(nameof(region));
 
         if (district is not null && string.IsNullOrWhiteSpace(district))
-            return Errors.General.ValueIsInvalid(nameof(district));
+            return Errors.Validation.CannotBeEmpty(nameof(district));
 
         if (string.IsNullOrWhiteSpace(city))
-            return Errors.General.ValueIsInvalid(nameof(city));
+            return Errors.Validation.CannotBeNullOrEmpty(nameof(city));
 
         if (string.IsNullOrWhiteSpace(street))
-            return Errors.General.ValueIsInvalid(nameof(street));
+            return Errors.Validation.CannotBeNullOrEmpty(nameof(street));
 
         if (string.IsNullOrWhiteSpace(house))
-            return Errors.General.ValueIsInvalid(nameof(house));
+            return Errors.Validation.CannotBeNullOrEmpty(nameof(house));
 
         if (building is not null && string.IsNullOrWhiteSpace(building))
-            return Errors.General.ValueIsInvalid(nameof(building));
+            return Errors.Validation.CannotBeEmpty(nameof(building));
 
         if (apartment is not null && string.IsNullOrWhiteSpace(apartment))
-            return Errors.General.ValueIsInvalid(nameof(apartment));
+            return Errors.Validation.CannotBeEmpty(nameof(apartment));
 
         return new Address(
             postalCode,
@@ -92,8 +96,8 @@ public sealed class Address : ComparableValueObject
     {
         yield return PostalCode;
         yield return Region;
-        yield return District ?? string.Empty;
         yield return City;
+        yield return District ?? string.Empty;
         yield return Street;
         yield return House;
         yield return Building ?? string.Empty;

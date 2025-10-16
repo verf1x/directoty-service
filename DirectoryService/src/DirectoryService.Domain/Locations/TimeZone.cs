@@ -1,6 +1,7 @@
 using CSharpFunctionalExtensions;
+using DirectoryService.Domain.Shared;
 
-namespace DirectoryService.Domain.ValueObjects;
+namespace DirectoryService.Domain.Locations;
 
 public sealed class TimeZone : ComparableValueObject
 {
@@ -11,7 +12,7 @@ public sealed class TimeZone : ComparableValueObject
     public static Result<TimeZone, Error> Create(string value)
     {
         if (string.IsNullOrWhiteSpace(value))
-            return Errors.General.ValueIsInvalid(nameof(value));
+            return Errors.Validation.CannotBeNullOrEmpty(nameof(value));
 
         try
         {
@@ -20,7 +21,7 @@ public sealed class TimeZone : ComparableValueObject
         }
         catch (Exception)
         {
-            return Errors.General.ValueIsInvalid(nameof(value));
+            return Errors.General.ValueIsInvalid(nameof(value), "Invalid time zone ID");
         }
     }
 
