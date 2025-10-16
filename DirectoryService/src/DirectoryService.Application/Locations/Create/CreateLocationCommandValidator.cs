@@ -10,23 +10,36 @@ public sealed class CreateLocationCommandValidator : AbstractValidator<CreateLoc
             .NotEmpty()
             .Length(3, 120);
 
-        RuleFor(c => c.AddressLines)
-            .Must(al => al.Count() is >= 2 and <= 4);
-
-        RuleFor(c => c.Locality)
-            .NotEmpty();
+        RuleFor(c => c.PostalCode)
+            .Length(6);
 
         RuleFor(c => c.Region)
-            .NotEmpty()
-            .When(c => c.Region is not null);
+            .MaximumLength(100)
+            .NotEmpty();
 
-        RuleFor(c => c.PostalCode)
-            .NotEmpty()
-            .When(c => c.PostalCode is not null);
+        RuleFor(c => c.City)
+            .MaximumLength(100)
+            .NotEmpty();
 
-        RuleFor(c => c.CountryCode)
-            .NotEmpty()
-            .Matches("^[A-Z]{2}$");
+        RuleFor(c => c.District)
+            .MaximumLength(100)
+            .When(c => c.District is not null);
+
+        RuleFor(c => c.Street)
+            .MaximumLength(250)
+            .NotEmpty();
+
+        RuleFor(c => c.House)
+            .MaximumLength(10)
+            .NotEmpty();
+
+        RuleFor(c => c.Building)
+            .MaximumLength(10)
+            .When(c => c.Building is not null);
+
+        RuleFor(c => c.Apartment)
+            .MaximumLength(10)
+            .When(c => c.Apartment is not null);
 
         RuleFor(c => c.TimeZone)
             .NotEmpty()

@@ -21,11 +21,14 @@ public sealed class LocationsController : ControllerBase
     {
         var command = new CreateLocationCommand(
             request.Name,
-            request.AddressLines,
-            request.Locality,
-            request.Region,
             request.PostalCode,
-            request.CountryCode,
+            request.Region,
+            request.City,
+            request.District,
+            request.Street,
+            request.House,
+            request.Building,
+            request.Apartment,
             request.TimeZone);
 
         return await handler.HandleAsync(command, cancellationToken);

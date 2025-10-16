@@ -1,4 +1,5 @@
 using DirectoryService.Domain.EntityIds;
+using DirectoryService.Domain.Locations;
 using DirectoryService.Domain.ValueObjects;
 using TimeZone = DirectoryService.Domain.ValueObjects.TimeZone;
 

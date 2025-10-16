@@ -1,74 +1,105 @@
-using System.Text.RegularExpressions;
 using CSharpFunctionalExtensions;
 
-namespace DirectoryService.Domain.ValueObjects;
+namespace DirectoryService.Domain.Locations;
 
 public sealed class Address : ComparableValueObject
 {
-    private const int MinAddressLines = 2;
-    private const int MaxAddressLines = 4;
-
     private Address(
-        IReadOnlyList<string> addressLines,
-        string locality,
-        string? region,
-        string? postalCode,
-        string countryCode)
+        string postalCode,
+        string region,
+        string city,
+        string? district,
+        string street,
+        string house,
+        string? building,
+        string? apartment)
     {
-        AddressLines = addressLines;
-        Locality = locality;
-        Region = region;
         PostalCode = postalCode;
-        CountryCode = countryCode;
+        Region = region;
+        City = city;
+        District = district;
+        Street = street;
+        House = house;
+        Building = building;
+        Apartment = apartment;
     }
 
-    public IReadOnlyList<string> AddressLines { get; }
+    public string PostalCode { get; }
 
-    public string Locality { get; }
+    public string Region { get; }
 
-    public string? Region { get; }
+    public string City { get; }
 
-    public string? PostalCode { get; }
+    public string? District { get; }
 
-    public string CountryCode { get; }
+    public string Street { get; }
+
+    public string House { get; }
+
+    public string? Building { get; }
+
+    public string? Apartment { get; }
 
     public static Result<Address, Error> Create(
-        List<string> addressLines,
-        string locality,
-        string? region,
-        string? postalCode,
-        string countryCode)
+        string postalCode,
+        string region,
+        string? district,
+        string city,
+        string street,
+        string house,
+        string? building,
+        string? apartment)
     {
-        if (addressLines.Count is < MinAddressLines or > MaxAddressLines)
-            return Errors.General.ValueIsInvalid(nameof(addressLines));
+        if (string.IsNullOrWhiteSpace(postalCode) || !IsValidPostalCode(postalCode))
+            return Errors.General.ValueIsInvalid(nameof(postalCode));
 
-        if (string.IsNullOrWhiteSpace(locality))
-            return Errors.General.ValueIsRequired(nameof(locality));
+        if (string.IsNullOrWhiteSpace(region))
+            return Errors.General.ValueIsInvalid(nameof(region));
 
-        if (string.IsNullOrWhiteSpace(countryCode) || !Regex.IsMatch(countryCode, @"^[A-Z]{2}$"))
-            return Errors.General.ValueIsRequired(nameof(countryCode));
+        if (district is not null && string.IsNullOrWhiteSpace(district))
+            return Errors.General.ValueIsInvalid(nameof(district));
 
-        return new Address(addressLines, locality, region, postalCode, countryCode);
+        if (string.IsNullOrWhiteSpace(city))
+            return Errors.General.ValueIsInvalid(nameof(city));
+
+        if (string.IsNullOrWhiteSpace(street))
+            return Errors.General.ValueIsInvalid(nameof(street));
+
+        if (string.IsNullOrWhiteSpace(house))
+            return Errors.General.ValueIsInvalid(nameof(house));
+
+        if (building is not null && string.IsNullOrWhiteSpace(building))
+            return Errors.General.ValueIsInvalid(nameof(building));
+
+        if (apartment is not null && string.IsNullOrWhiteSpace(apartment))
+            return Errors.General.ValueIsInvalid(nameof(apartment));
+
+        return new Address(
+            postalCode,
+            region,
+            city,
+            district,
+            street,
+            house,
+            building,
+            apartment);
     }
 
     public override string ToString()
-    {
-        List<string> parts = [];
-        parts.AddRange(AddressLines);
-        parts.Add(Locality);
-
-        if (!string.IsNullOrEmpty(Region))
-            parts.Add(Region!);
-
-        if (!string.IsNullOrEmpty(PostalCode))
-            parts.Add(PostalCode!);
-
-        parts.Add(CountryCode);
-        return string.Join(", ", parts);
-    }
+        => $"{PostalCode}, {Region}, {City}, {District}, {Street}, {House}, {Building}, {Apartment}";
 
     protected override IEnumerable<IComparable> GetComparableEqualityComponents()
     {
-        yield return ToString();
+        yield return PostalCode;
+        yield return Region;
+        yield return District ?? string.Empty;
+        yield return City;
+        yield return Street;
+        yield return House;
+        yield return Building ?? string.Empty;
+        yield return Apartment ?? string.Empty;
     }
+
+    private static bool IsValidPostalCode(string code)
+        => code.Length == 6 && code.All(char.IsDigit);
 }

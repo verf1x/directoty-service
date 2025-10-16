@@ -3,6 +3,7 @@ using DirectoryService.Application.Abstractions;
 using DirectoryService.Application.Extensions;
 using DirectoryService.Domain;
 using DirectoryService.Domain.Entities;
+using DirectoryService.Domain.Locations;
 using DirectoryService.Domain.ValueObjects;
 using FluentValidation;
 using Microsoft.Extensions.Logging;
@@ -37,11 +38,14 @@ public sealed class CreateLocationHandler : ICommandHandler<CreateLocationComman
         var locationName = LocationName.Create(command.Name).Value;
 
         var address = Address.Create(
-            command.AddressLines.ToList(),
-            command.Locality,
-            command.Region,
             command.PostalCode,
-            command.CountryCode).Value;
+            command.Region,
+            command.District,
+            command.City,
+            command.Street,
+            command.House,
+            command.Building,
+            command.Apartment).Value;
 
         var timeZone = TimeZone.Create(command.TimeZone).Value;
 

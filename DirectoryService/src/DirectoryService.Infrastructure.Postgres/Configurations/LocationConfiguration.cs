@@ -30,29 +30,45 @@ public sealed class LocationConfiguration : IEntityTypeConfiguration<Location>
         {
             ab.ToJson("address");
 
-            ab.Property(a => a.AddressLines)
-                .HasColumnName("address_lines")
+            ab.Property(a => a.PostalCode)
+                .HasColumnName("postal_code")
+                .HasMaxLength(6)
                 .IsRequired();
 
-            ab.Property(p => p.Locality)
-                    .IsRequired()
-                    .HasColumnName("locality")
-                    .HasMaxLength(100);
-
             ab.Property(p => p.Region)
-                .IsRequired(false)
+                .IsRequired()
                 .HasColumnName("region")
                 .HasMaxLength(100);
 
-            ab.Property(p => p.CountryCode)
+            ab.Property(p => p.City)
                 .IsRequired()
-                .HasColumnName("country_code")
-                .HasMaxLength(2);
+                .HasColumnName("city")
+                .HasMaxLength(100);
 
-            ab.Property(p => p.PostalCode)
+            ab.Property(p => p.District)
                 .IsRequired(false)
-                .HasColumnName("postal_code")
-                .HasMaxLength(20);
+                .HasColumnName("district")
+                .HasMaxLength(150);
+
+            ab.Property(p => p.Street)
+                .IsRequired()
+                .HasColumnName("street")
+                .HasMaxLength(150);
+
+            ab.Property(p => p.House)
+                .IsRequired()
+                .HasColumnName("house")
+                .HasMaxLength(10);
+
+            ab.Property(p => p.Building)
+                .IsRequired(false)
+                .HasColumnName("building")
+                .HasMaxLength(10);
+
+            ab.Property(p => p.Apartment)
+                .IsRequired(false)
+                .HasColumnName("apartment")
+                .HasMaxLength(10);
         });
 
         builder.ComplexProperty(l => l.TimeZone, tzb =>
