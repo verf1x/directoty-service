@@ -44,27 +44,47 @@ public sealed class EfCoreLocationsRepository : ILocationsRepository
         }
     }
 
-    public async Task<Result<Location, Error>> GetByNameAsync(
+    public async Task<Result<bool, Error>> CheckIfLocationWithNameExistsAsync(
         LocationName locationName,
         CancellationToken cancellationToken)
     {
-        var location = await _dbContext.Locations
-            .FirstOrDefaultAsync(l => l.Name == locationName, cancellationToken);
+        try
+        {
+            return await _dbContext.Locations
+                .AnyAsync(l => l.Name == locationName, cancellationToken);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(
+                ex,
+                "Error checking if location with name {LocationName} exists in the database",
+                locationName.Value);
 
-        if (location is null)
-            return Errors.General.NotFound();
-
-        return location;
+            return Error.Failure(
+                "location.check.name",
+                "An error occurred while checking for the location in the database.");
+        }
     }
 
-    public async Task<Result<Location, Error>> GetByAddressAsync(Address address, CancellationToken cancellationToken)
+    public async Task<Result<bool, Error>> CheckIfLocationOnAddressExistsAsync(
+        Address address,
+        CancellationToken cancellationToken)
     {
-        var location = await _dbContext.Locations
-            .FirstOrDefaultAsync(l => l.Address == address, cancellationToken);
+        try
+        {
+            return await _dbContext.Locations
+                .AnyAsync(l => l.Address == address, cancellationToken);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(
+                ex,
+                "Error checking if location with address {Address} exists in the database",
+                address);
 
-        if (location is null)
-            return Errors.General.NotFound();
-
-        return location;
+            return Error.Failure(
+                "location.check.address",
+                "An error occurred while checking for the location in the database.");
+        }
     }
 }

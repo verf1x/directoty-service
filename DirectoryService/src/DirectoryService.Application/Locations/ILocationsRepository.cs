@@ -9,7 +9,7 @@ public interface ILocationsRepository
 {
     Task<Result<Guid, Error>> AddAsync(Location location, CancellationToken cancellationToken);
 
-    Task<Result<Location, Error>> GetByNameAsync(LocationName locationName, CancellationToken cancellationToken);
+    Task<Result<bool, Error>> CheckIfLocationWithNameExistsAsync(LocationName locationName, CancellationToken cancellationToken);
 
-    Task<Result<Location, Error>> GetByAddressAsync(Address address, CancellationToken cancellationToken);
+    Task<Result<bool, Error>> CheckIfLocationOnAddressExistsAsync(Address address, CancellationToken cancellationToken);
 }

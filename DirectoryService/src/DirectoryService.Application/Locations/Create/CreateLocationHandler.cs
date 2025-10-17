@@ -36,13 +36,16 @@ public sealed class CreateLocationHandler : ICommandHandler<CreateLocationComman
         var locationName = LocationName.Create(command.Name).Value;
 
         var existingLocationByNameResult = await _locationsRepository
-            .GetByNameAsync(locationName, cancellationToken);
+            .CheckIfLocationWithNameExistsAsync(locationName, cancellationToken);
 
-        if (existingLocationByNameResult.IsSuccess)
+        if (existingLocationByNameResult.IsFailure)
+            return existingLocationByNameResult.Error.ToErrors();
+
+        if (existingLocationByNameResult.Value)
         {
             return Error.Conflict(
                 "location.with.name.already.exists",
-                $"Location with name {command.Name} already exists").ToErrors();
+                "Location with the specified name already exists").ToErrors();
         }
 
         var address = Address.Create(
@@ -56,13 +59,16 @@ public sealed class CreateLocationHandler : ICommandHandler<CreateLocationComman
             command.Apartment).Value;
 
         var existingLocationByAddressResult = await _locationsRepository
-            .GetByAddressAsync(address, cancellationToken);
+            .CheckIfLocationOnAddressExistsAsync(address, cancellationToken);
 
-        if (existingLocationByAddressResult.IsSuccess)
+        if (existingLocationByAddressResult.IsFailure)
+            return existingLocationByAddressResult.Error.ToErrors();
+
+        if (existingLocationByAddressResult.Value)
         {
             return Error.Conflict(
-                "location.with.address.already.exists",
-                $"Location on address {address} already exists").ToErrors();
+                "location.on.address.already.exists",
+                "Location on the specified address already exists").ToErrors();
         }
 
         var timeZone = TimeZone.Create(command.TimeZone).Value;
