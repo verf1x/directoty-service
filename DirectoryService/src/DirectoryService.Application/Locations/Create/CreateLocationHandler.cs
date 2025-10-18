@@ -12,16 +12,19 @@ namespace DirectoryService.Application.Locations.Create;
 public sealed class CreateLocationHandler : ICommandHandler<CreateLocationCommand, Guid>
 {
     private readonly IValidator<CreateLocationCommand> _validator;
-    private readonly ILocationsRepository _locationsRepository;
+    private readonly ILocationCommandsRepository _locationCommandsRepository;
+    private readonly ILocationQueriesRepository _locationQueriesRepository;
     private readonly ILogger<CreateLocationHandler> _logger;
 
     public CreateLocationHandler(
         IValidator<CreateLocationCommand> validator,
-        ILocationsRepository locationsRepository,
+        ILocationCommandsRepository locationCommandsRepository,
+        ILocationQueriesRepository locationQueriesRepository,
         ILogger<CreateLocationHandler> logger)
     {
         _validator = validator;
-        _locationsRepository = locationsRepository;
+        _locationCommandsRepository = locationCommandsRepository;
+        _locationQueriesRepository = locationQueriesRepository;
         _logger = logger;
     }
 
@@ -35,13 +38,10 @@ public sealed class CreateLocationHandler : ICommandHandler<CreateLocationComman
 
         var locationName = LocationName.Create(command.Name).Value;
 
-        var existingLocationByNameResult = await _locationsRepository
+        bool isLocationWithNameExists = await _locationQueriesRepository
             .CheckIfLocationWithNameExistsAsync(locationName, cancellationToken);
 
-        if (existingLocationByNameResult.IsFailure)
-            return existingLocationByNameResult.Error.ToErrors();
-
-        if (existingLocationByNameResult.Value)
+        if (isLocationWithNameExists)
         {
             return Error.Conflict(
                 "location.with.name.already.exists",
@@ -58,13 +58,10 @@ public sealed class CreateLocationHandler : ICommandHandler<CreateLocationComman
             command.Building,
             command.Apartment).Value;
 
-        var existingLocationByAddressResult = await _locationsRepository
+        bool isLocationOnAddressExists = await _locationQueriesRepository
             .CheckIfLocationOnAddressExistsAsync(address, cancellationToken);
 
-        if (existingLocationByAddressResult.IsFailure)
-            return existingLocationByAddressResult.Error.ToErrors();
-
-        if (existingLocationByAddressResult.Value)
+        if (isLocationOnAddressExists)
         {
             return Error.Conflict(
                 "location.on.address.already.exists",
@@ -75,7 +72,7 @@ public sealed class CreateLocationHandler : ICommandHandler<CreateLocationComman
 
         var location = new Location(locationName, address, timeZone);
 
-        var addResult = await _locationsRepository.AddAsync(location, cancellationToken);
+        var addResult = await _locationCommandsRepository.AddAsync(location, cancellationToken);
         if (addResult.IsFailure)
             return addResult.Error.ToErrors();
 

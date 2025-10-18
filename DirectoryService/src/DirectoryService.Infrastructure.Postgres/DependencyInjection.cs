@@ -1,4 +1,5 @@
 using DirectoryService.Application.Locations;
+using DirectoryService.Infrastructure.Postgres.Database;
 using DirectoryService.Infrastructure.Postgres.Repositories;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -23,7 +24,10 @@ public static class DependencyInjection
             options.EnableDetailedErrors();
         });
 
-        services.AddScoped<ILocationsRepository, EfCoreLocationsRepository>();
+        services.AddSingleton<IDbConnectionFactory, NpgSqlConnectionFactory>();
+
+        services.AddScoped<ILocationCommandsRepository, EfCoreLocationCommandsRepository>();
+        services.AddScoped<ILocationQueriesRepository, SqlLocationQueriesRepository>();
 
         return services;
     }

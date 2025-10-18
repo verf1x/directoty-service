@@ -8,14 +8,14 @@ using Microsoft.Extensions.Logging;
 
 namespace DirectoryService.Infrastructure.Postgres.Repositories;
 
-public sealed class EfCoreLocationsRepository : ILocationsRepository
+public sealed class EfCoreLocationCommandsRepository : ILocationCommandsRepository
 {
     private readonly DirectoryServiceDbContext _dbContext;
-    private readonly ILogger<EfCoreLocationsRepository> _logger;
+    private readonly ILogger<EfCoreLocationCommandsRepository> _logger;
 
-    public EfCoreLocationsRepository(
+    public EfCoreLocationCommandsRepository(
         DirectoryServiceDbContext dbContext,
-        ILogger<EfCoreLocationsRepository> logger)
+        ILogger<EfCoreLocationCommandsRepository> logger)
     {
         _dbContext = dbContext;
         _logger = logger;
