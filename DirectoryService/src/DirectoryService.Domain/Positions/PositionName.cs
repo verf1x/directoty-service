@@ -1,6 +1,7 @@
 using CSharpFunctionalExtensions;
+using DirectoryService.Domain.Shared;
 
-namespace DirectoryService.Domain.ValueObjects;
+namespace DirectoryService.Domain.Positions;
 
 public sealed class PositionName : ComparableValueObject
 {

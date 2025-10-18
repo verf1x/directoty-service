@@ -1,11 +1,10 @@
-using DirectoryService.Domain.Entities;
-using DirectoryService.Domain.EntityIds;
+using DirectoryService.Domain.Departments;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace DirectoryService.Infrastructure.Postgres.Configurations;
 
-public class DepartmentConfiguration : IEntityTypeConfiguration<Department>
+public sealed class DepartmentConfiguration : IEntityTypeConfiguration<Department>
 {
     public void Configure(EntityTypeBuilder<Department> builder)
     {

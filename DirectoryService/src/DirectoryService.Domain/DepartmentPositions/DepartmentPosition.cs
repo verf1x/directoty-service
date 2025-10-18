@@ -1,9 +1,9 @@
-using DirectoryService.Domain.EntityIds;
-using DirectoryService.Domain.ValueObjects;
+using DirectoryService.Domain.Departments;
+using DirectoryService.Domain.Positions;
 
-namespace DirectoryService.Domain.Entities;
+namespace DirectoryService.Domain.DepartmentPositions;
 
-public class DepartmentPosition
+public sealed class DepartmentPosition
 {
     public DepartmentPosition(DepartmentId departmentId, PositionId positionId)
     {

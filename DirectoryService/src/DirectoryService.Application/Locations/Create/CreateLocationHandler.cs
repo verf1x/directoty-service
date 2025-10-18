@@ -1,16 +1,15 @@
 ﻿using CSharpFunctionalExtensions;
 using DirectoryService.Application.Abstractions;
-using DirectoryService.Application.Extensions;
-using DirectoryService.Domain;
-using DirectoryService.Domain.Entities;
-using DirectoryService.Domain.ValueObjects;
+using DirectoryService.Application.Validation;
+using DirectoryService.Domain.Locations;
+using DirectoryService.Domain.Shared;
 using FluentValidation;
 using Microsoft.Extensions.Logging;
-using TimeZone = DirectoryService.Domain.ValueObjects.TimeZone;
+using TimeZone = DirectoryService.Domain.Locations.TimeZone;
 
 namespace DirectoryService.Application.Locations.Create;
 
-public class CreateLocationHandler : ICommandHandler<CreateLocationCommand, Guid>
+public sealed class CreateLocationHandler : ICommandHandler<CreateLocationCommand, Guid>
 {
     private readonly IValidator<CreateLocationCommand> _validator;
     private readonly ILocationsRepository _locationsRepository;
@@ -36,12 +35,41 @@ public class CreateLocationHandler : ICommandHandler<CreateLocationCommand, Guid
 
         var locationName = LocationName.Create(command.Name).Value;
 
+        var existingLocationByNameResult = await _locationsRepository
+            .CheckIfLocationWithNameExistsAsync(locationName, cancellationToken);
+
+        if (existingLocationByNameResult.IsFailure)
+            return existingLocationByNameResult.Error.ToErrors();
+
+        if (existingLocationByNameResult.Value)
+        {
+            return Error.Conflict(
+                "location.with.name.already.exists",
+                "Location with the specified name already exists").ToErrors();
+        }
+
         var address = Address.Create(
-            command.AddressLines.ToList(),
-            command.Locality,
-            command.Region,
             command.PostalCode,
-            command.CountryCode).Value;
+            command.Region,
+            command.City,
+            command.District,
+            command.Street,
+            command.House,
+            command.Building,
+            command.Apartment).Value;
+
+        var existingLocationByAddressResult = await _locationsRepository
+            .CheckIfLocationOnAddressExistsAsync(address, cancellationToken);
+
+        if (existingLocationByAddressResult.IsFailure)
+            return existingLocationByAddressResult.Error.ToErrors();
+
+        if (existingLocationByAddressResult.Value)
+        {
+            return Error.Conflict(
+                "location.on.address.already.exists",
+                "Location on the specified address already exists").ToErrors();
+        }
 
         var timeZone = TimeZone.Create(command.TimeZone).Value;
 

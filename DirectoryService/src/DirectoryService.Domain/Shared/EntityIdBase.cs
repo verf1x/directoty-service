@@ -1,6 +1,6 @@
 using CSharpFunctionalExtensions;
 
-namespace DirectoryService.Domain.EntityIds;
+namespace DirectoryService.Domain.Shared;
 
 public abstract class EntityIdBase : ComparableValueObject
 {

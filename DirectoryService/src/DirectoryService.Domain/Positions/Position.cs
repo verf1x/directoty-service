@@ -1,9 +1,8 @@
-using DirectoryService.Domain.EntityIds;
-using DirectoryService.Domain.ValueObjects;
+using DirectoryService.Domain.DepartmentPositions;
 
-namespace DirectoryService.Domain.Entities;
+namespace DirectoryService.Domain.Positions;
 
-public class Position
+public sealed class Position
 {
     private readonly List<DepartmentPosition> _departmentPositions = [];
 

@@ -1,10 +1,8 @@
-using DirectoryService.Domain.EntityIds;
-using DirectoryService.Domain.ValueObjects;
-using TimeZone = DirectoryService.Domain.ValueObjects.TimeZone;
+using DirectoryService.Domain.DepartmentLocations;
 
-namespace DirectoryService.Domain.Entities;
+namespace DirectoryService.Domain.Locations;
 
-public class Location
+public sealed class Location
 {
     private readonly List<DepartmentLocation> _departmentLocations = [];
 

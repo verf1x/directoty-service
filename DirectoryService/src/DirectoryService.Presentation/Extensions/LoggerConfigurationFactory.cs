@@ -1,13 +1,13 @@
 ﻿using Serilog;
 using Serilog.Events;
-using ILogger = Serilog.ILogger;
 
 namespace DirectoryService.Presentation.Extensions;
 
 public static class LoggerConfigurationFactory
 {
-    public static ILogger Create(string seqConnection) =>
-        new LoggerConfiguration()
+    public static void Configure(LoggerConfiguration configuration, string seqConnection)
+    {
+        configuration
             .WriteTo.Console()
             .WriteTo.Debug()
             .WriteTo.Seq(seqConnection)
@@ -19,6 +19,6 @@ public static class LoggerConfigurationFactory
             .MinimumLevel.Override("Microsoft.AspNetCore.Mvc", LogEventLevel.Warning)
             .MinimumLevel.Override("Microsoft.AspNetCore.Routing", LogEventLevel.Warning)
             .MinimumLevel.Override("Microsoft.EntityFrameworkCore.Database.Command", LogEventLevel.Information)
-            .MinimumLevel.Override("Microsoft.EntityFrameworkCore.Infrastructure", LogEventLevel.Warning)
-            .CreateLogger();
+            .MinimumLevel.Override("Microsoft.EntityFrameworkCore.Infrastructure", LogEventLevel.Warning);
+    }
 }

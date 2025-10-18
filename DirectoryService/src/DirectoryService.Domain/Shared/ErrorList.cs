@@ -1,8 +1,8 @@
 ﻿using System.Collections;
 
-namespace DirectoryService.Domain;
+namespace DirectoryService.Domain.Shared;
 
-public class ErrorList : IEnumerable<Error>
+public sealed class ErrorList : IEnumerable<Error>
 {
     private readonly List<Error> _errors;
 

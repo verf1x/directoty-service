@@ -1,12 +1,12 @@
-using DirectoryService.Domain.Entities;
-using DirectoryService.Domain.EntityIds;
-using DirectoryService.Domain.ValueObjects;
+using DirectoryService.Domain.DepartmentPositions;
+using DirectoryService.Domain.Departments;
+using DirectoryService.Domain.Positions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace DirectoryService.Infrastructure.Postgres.Configurations;
 
-public class DepartmentPositionConfiguration : IEntityTypeConfiguration<DepartmentPosition>
+public sealed class DepartmentPositionConfiguration : IEntityTypeConfiguration<DepartmentPosition>
 {
     public void Configure(EntityTypeBuilder<DepartmentPosition> builder)
     {
