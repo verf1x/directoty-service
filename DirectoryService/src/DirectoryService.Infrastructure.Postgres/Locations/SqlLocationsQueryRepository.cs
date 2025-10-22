@@ -3,18 +3,18 @@ using DirectoryService.Application.Locations;
 using DirectoryService.Domain.Locations;
 using DirectoryService.Infrastructure.Postgres.Database;
 
-namespace DirectoryService.Infrastructure.Postgres.Repositories;
+namespace DirectoryService.Infrastructure.Postgres.Locations;
 
-public class SqlLocationQueriesRepository : ILocationQueriesRepository
+public class SqlLocationsQueryRepository : ILocationsQueryRepository
 {
     private readonly IDbConnectionFactory _dbConnectionFactory;
 
-    public SqlLocationQueriesRepository(IDbConnectionFactory dbConnectionFactory)
+    public SqlLocationsQueryRepository(IDbConnectionFactory dbConnectionFactory)
     {
         _dbConnectionFactory = dbConnectionFactory;
     }
 
-    public async Task<bool> CheckIfLocationWithNameExistsAsync(
+    public async Task<bool> LocationWithNameExistsAsync(
         LocationName locationName,
         CancellationToken cancellationToken)
     {
@@ -29,7 +29,7 @@ public class SqlLocationQueriesRepository : ILocationQueriesRepository
         return count > 0;
     }
 
-    public async Task<bool> CheckIfLocationOnAddressExistsAsync(
+    public async Task<bool> LocationOnAddressExistsAsync(
         Address address,
         CancellationToken cancellationToken)
     {
@@ -59,6 +59,21 @@ public class SqlLocationQueriesRepository : ILocationQueriesRepository
             address.Building,
             address.Apartment,
         };
+
+        int count = await connection.ExecuteScalarAsync<int>(query, sqlParams);
+
+        return count > 0;
+    }
+
+    public async Task<bool> LocationExistsByIdAsync(
+        Guid locationId,
+        CancellationToken cancellationToken)
+    {
+        using var connection = await _dbConnectionFactory.CreateConnectionAsync(cancellationToken);
+
+        const string query = "SELECT COUNT(1) FROM Locations WHERE \"Id\" = @Id";
+
+        var sqlParams = new { Id = locationId };
 
         int count = await connection.ExecuteScalarAsync<int>(query, sqlParams);
 

@@ -4,7 +4,7 @@ using DirectoryService.Domain.Shared;
 
 namespace DirectoryService.Application.Locations;
 
-public interface ILocationCommandsRepository
+public interface ILocationsCommandRepository
 {
     Task<Result<Guid, Error>> AddAsync(Location location, CancellationToken cancellationToken);
 }

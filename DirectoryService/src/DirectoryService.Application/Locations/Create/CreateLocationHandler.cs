@@ -12,19 +12,19 @@ namespace DirectoryService.Application.Locations.Create;
 public sealed class CreateLocationHandler : ICommandHandler<CreateLocationCommand, Guid>
 {
     private readonly IValidator<CreateLocationCommand> _validator;
-    private readonly ILocationCommandsRepository _locationCommandsRepository;
-    private readonly ILocationQueriesRepository _locationQueriesRepository;
+    private readonly ILocationsCommandRepository _locationsCommandRepository;
+    private readonly ILocationsQueryRepository _locationsQueryRepository;
     private readonly ILogger<CreateLocationHandler> _logger;
 
     public CreateLocationHandler(
         IValidator<CreateLocationCommand> validator,
-        ILocationCommandsRepository locationCommandsRepository,
-        ILocationQueriesRepository locationQueriesRepository,
+        ILocationsCommandRepository locationsCommandRepository,
+        ILocationsQueryRepository locationsQueryRepository,
         ILogger<CreateLocationHandler> logger)
     {
         _validator = validator;
-        _locationCommandsRepository = locationCommandsRepository;
-        _locationQueriesRepository = locationQueriesRepository;
+        _locationsCommandRepository = locationsCommandRepository;
+        _locationsQueryRepository = locationsQueryRepository;
         _logger = logger;
     }
 
@@ -38,8 +38,8 @@ public sealed class CreateLocationHandler : ICommandHandler<CreateLocationComman
 
         var locationName = LocationName.Create(command.Name).Value;
 
-        bool isLocationWithNameExists = await _locationQueriesRepository
-            .CheckIfLocationWithNameExistsAsync(locationName, cancellationToken);
+        bool isLocationWithNameExists = await _locationsQueryRepository
+            .LocationWithNameExistsAsync(locationName, cancellationToken);
 
         if (isLocationWithNameExists)
         {
@@ -58,8 +58,8 @@ public sealed class CreateLocationHandler : ICommandHandler<CreateLocationComman
             command.Building,
             command.Apartment).Value;
 
-        bool isLocationOnAddressExists = await _locationQueriesRepository
-            .CheckIfLocationOnAddressExistsAsync(address, cancellationToken);
+        bool isLocationOnAddressExists = await _locationsQueryRepository
+            .LocationOnAddressExistsAsync(address, cancellationToken);
 
         if (isLocationOnAddressExists)
         {
@@ -72,7 +72,7 @@ public sealed class CreateLocationHandler : ICommandHandler<CreateLocationComman
 
         var location = new Location(locationName, address, timeZone);
 
-        var addResult = await _locationCommandsRepository.AddAsync(location, cancellationToken);
+        var addResult = await _locationsCommandRepository.AddAsync(location, cancellationToken);
         if (addResult.IsFailure)
             return addResult.Error.ToErrors();
 

@@ -14,7 +14,7 @@ public sealed class Identifier : ComparableValueObject
     {
         var latinHyphenOnlyRegex = new Regex(@"^[a-z]+(-[a-z]+)*$");
 
-        if (!string.IsNullOrWhiteSpace(value) || (value.Length is < 3 or > 150) || !latinHyphenOnlyRegex.IsMatch(value))
+        if (string.IsNullOrWhiteSpace(value) || (value.Length is < 3 or > 150) || !latinHyphenOnlyRegex.IsMatch(value))
             return Errors.General.ValueIsInvalid(nameof(value));
 
         return new Identifier(value);
