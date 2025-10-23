@@ -12,20 +12,20 @@ using Path = DirectoryService.Domain.Departments.Path;
 
 namespace DirectoryService.Application.Departments.Create;
 
-public sealed class CreateDepartmentCommandHandler : ICommandHandler<CreateDepartmentCommand, Guid>
+public sealed class CreateDepartmentHandler : ICommandHandler<CreateDepartmentCommand, Guid>
 {
     private readonly IValidator<CreateDepartmentCommand> _validator;
     private readonly ILocationsQueryRepository _locationsRepository;
     private readonly IDepartmentsQueryRepository _departmentsQueryRepository;
     private readonly IDepartmentsCommandRepository _departmentsCommandRepository;
-    private readonly ILogger<CreateDepartmentCommandHandler> _logger;
+    private readonly ILogger<CreateDepartmentHandler> _logger;
 
-    public CreateDepartmentCommandHandler(
+    public CreateDepartmentHandler(
         IValidator<CreateDepartmentCommand> validator,
         ILocationsQueryRepository locationsRepository,
         IDepartmentsQueryRepository departmentsQueryRepository,
         IDepartmentsCommandRepository departmentsCommandRepository,
-        ILogger<CreateDepartmentCommandHandler> logger)
+        ILogger<CreateDepartmentHandler> logger)
     {
         _validator = validator;
         _locationsRepository = locationsRepository;
@@ -62,7 +62,11 @@ public sealed class CreateDepartmentCommandHandler : ICommandHandler<CreateDepar
         }
         else
         {
-            department = CreateRootDepartment(command);
+            var rootDepartmentResult = await CreateRootDepartment(command, cancellationToken);
+            if (rootDepartmentResult.IsFailure)
+                return rootDepartmentResult.Error.ToErrors();
+
+            department = rootDepartmentResult.Value;
         }
 
         var result = await _departmentsCommandRepository.AddAsync(department, cancellationToken);
@@ -75,8 +79,17 @@ public sealed class CreateDepartmentCommandHandler : ICommandHandler<CreateDepar
         return result.Value;
     }
 
-    private Department CreateRootDepartment(CreateDepartmentCommand command)
+    private async Task<Result<Department, Error>> CreateRootDepartment(
+        CreateDepartmentCommand command, CancellationToken cancellationToken)
     {
+        bool isUniqueIdentifier =
+            !await _departmentsQueryRepository.DepartmentWithIdentifierExistsAsync(
+                command.Identifier,
+                cancellationToken);
+
+        if (!isUniqueIdentifier)
+            return Errors.General.Conflict();
+
         var identifier = Identifier.Create(command.Identifier).Value;
 
         var departmentName = DepartmentName.Create(command.Name).Value;
@@ -102,18 +115,15 @@ public sealed class CreateDepartmentCommandHandler : ICommandHandler<CreateDepar
         if (parentDepartmentDtoResult.IsFailure)
             return parentDepartmentDtoResult.Error.ToErrors();
 
-        bool brothersWithIdentifierExists = await _departmentsQueryRepository.IsChildrenWithIdentifierExists(
-            command.ParentId.Value,
-            command.Identifier,
-            cancellationToken);
+        bool isUniqueIdentifier =
+            !await _departmentsQueryRepository.DepartmentWithIdentifierExistsAsync(
+                command.Identifier,
+                cancellationToken);
 
-        if (brothersWithIdentifierExists)
+        if (!isUniqueIdentifier)
             return Errors.General.Conflict().ToErrors();
 
         var identifier = Identifier.Create(command.Identifier).Value;
-
-        if (!IsUniqueIdentifier(identifier, parentDepartmentDtoResult.Value.Path))
-            return Errors.General.Conflict().ToErrors();
 
         var departmentName = DepartmentName.Create(command.Name).Value;
 
@@ -142,13 +152,6 @@ public sealed class CreateDepartmentCommandHandler : ICommandHandler<CreateDepar
             .ToList();
 
         return departmentLocations;
-    }
-
-    private bool IsUniqueIdentifier(Identifier identifier, string parentPath)
-    {
-        var parentIdentifiers = parentPath.Split('.').ToList();
-
-        return !parentIdentifiers.Contains(identifier.Value);
     }
 
     private Path BuildChildPath(string parentPath, Identifier identifier)

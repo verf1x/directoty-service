@@ -37,23 +37,20 @@ public class SqlDepartmentsQueryRepository : IDepartmentsQueryRepository
         return result;
     }
 
-    public async Task<bool> IsChildrenWithIdentifierExists(
-        Guid parentId,
+    public async Task<bool> DepartmentWithIdentifierExistsAsync(
         string identifier,
         CancellationToken cancellationToken)
     {
         using var connection = await _dbConnectionFactory.CreateConnectionAsync(cancellationToken);
 
         const string query = """
-                             SELECT COUNT(*) FROM Departments 
-                             WHERE parent_id = @ParentId
-                             AND identifier = @Identifier
+                             SELECT EXISTS (
+                                SELECT 1 FROM Departments 
+                                WHERE identifier = @Identifier);
                              """;
 
-        var parameters = new { ParentId = parentId, Identifier = identifier };
+        var parameters = new { Identifier = identifier };
 
-        int count = await connection.ExecuteScalarAsync<int>(query, parameters);
-
-        return count > 0;
+        return await connection.ExecuteScalarAsync<bool>(query, parameters);
     }
 }

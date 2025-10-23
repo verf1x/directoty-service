@@ -10,8 +10,7 @@ public interface IDepartmentsQueryRepository
         Guid parentId,
         CancellationToken cancellationToken);
 
-    Task<bool> IsChildrenWithIdentifierExists(
-        Guid parentId,
+    Task<bool> DepartmentWithIdentifierExistsAsync(
         string identifier,
         CancellationToken cancellationToken);
 }

@@ -20,13 +20,16 @@ public class SqlLocationsQueryRepository : ILocationsQueryRepository
     {
         using var connection = await _dbConnectionFactory.CreateConnectionAsync(cancellationToken);
 
-        const string query = "SELECT COUNT(1) FROM Locations WHERE Name = @Name";
+        const string query = """
+                             SELECT EXISTS(
+                                 SELECT 1 FROM Locations
+                                 WHERE Name = @Name
+                             )
+                             """;
 
         var sqlParams = new { Name = locationName.Value };
 
-        int count = await connection.ExecuteScalarAsync<int>(query, sqlParams);
-
-        return count > 0;
+        return await connection.ExecuteScalarAsync<bool>(query, sqlParams);
     }
 
     public async Task<bool> LocationOnAddressExistsAsync(
@@ -36,16 +39,17 @@ public class SqlLocationsQueryRepository : ILocationsQueryRepository
         using var connection = await _dbConnectionFactory.CreateConnectionAsync(cancellationToken);
 
         const string query = """
-
-                             SELECT COUNT(1) FROM Locations
-                             WHERE "postal_code" = @PostalCode
-                             AND Region = @Region
-                             AND City = @City
-                             AND District = @District
-                             AND Street = @Street
-                             AND House = @House
-                             AND Building = @Building
-                             AND Apartment = @Apartment
+                             SELECT EXISTS(
+                                 SELECT 1 FROM Locations
+                                 WHERE "postal_code" = @PostalCode
+                                 AND Region = @Region
+                                 AND City = @City
+                                 AND District = @District
+                                 AND Street = @Street
+                                 AND House = @House
+                                 AND Building = @Building
+                                 AND Apartment = @Apartment
+                             )
                              """;
 
         var sqlParams = new
@@ -60,9 +64,7 @@ public class SqlLocationsQueryRepository : ILocationsQueryRepository
             address.Apartment,
         };
 
-        int count = await connection.ExecuteScalarAsync<int>(query, sqlParams);
-
-        return count > 0;
+        return await connection.ExecuteScalarAsync<bool>(query, sqlParams);
     }
 
     public async Task<bool> LocationExistsByIdAsync(
@@ -71,12 +73,15 @@ public class SqlLocationsQueryRepository : ILocationsQueryRepository
     {
         using var connection = await _dbConnectionFactory.CreateConnectionAsync(cancellationToken);
 
-        const string query = "SELECT COUNT(1) FROM Locations WHERE \"Id\" = @Id";
+        const string query = """
+                             SELECT EXISTS(
+                                 SELECT 1 FROM Locations
+                                 WHERE "Id" = @Id
+                             )
+                             """;
 
         var sqlParams = new { Id = locationId };
 
-        int count = await connection.ExecuteScalarAsync<int>(query, sqlParams);
-
-        return count > 0;
+        return await connection.ExecuteScalarAsync<bool>(query, sqlParams);
     }
 }
