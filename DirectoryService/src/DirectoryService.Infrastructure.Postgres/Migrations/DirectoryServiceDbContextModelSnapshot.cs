@@ -243,16 +243,6 @@ namespace DirectoryService.Infrastructure.Postgres.Migrations
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("updated_at");
 
-                    b.ComplexProperty<Dictionary<string, object>>("Description", "DirectoryService.Domain.Positions.Position.Description#Description", b1 =>
-                        {
-                            b1.IsRequired();
-
-                            b1.Property<string>("Value")
-                                .HasMaxLength(5000)
-                                .HasColumnType("character varying(5000)")
-                                .HasColumnName("description");
-                        });
-
                     b.ComplexProperty<Dictionary<string, object>>("Name", "DirectoryService.Domain.Positions.Position.Name#PositionName", b1 =>
                         {
                             b1.IsRequired();
@@ -328,6 +318,30 @@ namespace DirectoryService.Infrastructure.Postgres.Migrations
                         });
 
                     b.Navigation("ParentId");
+                });
+
+            modelBuilder.Entity("DirectoryService.Domain.Positions.Position", b =>
+                {
+                    b.OwnsOne("DirectoryService.Domain.Positions.Description", "Description", b1 =>
+                        {
+                            b1.Property<Guid>("PositionId")
+                                .HasColumnType("uuid");
+
+                            b1.Property<string>("Value")
+                                .IsRequired()
+                                .HasMaxLength(5000)
+                                .HasColumnType("character varying(5000)")
+                                .HasColumnName("description");
+
+                            b1.HasKey("PositionId");
+
+                            b1.ToTable("positions");
+
+                            b1.WithOwner()
+                                .HasForeignKey("PositionId");
+                        });
+
+                    b.Navigation("Description");
                 });
 
             modelBuilder.Entity("DirectoryService.Domain.Departments.Department", b =>

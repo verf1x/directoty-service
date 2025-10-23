@@ -1,8 +1,10 @@
 using DirectoryService.Application.Departments;
 using DirectoryService.Application.Locations;
+using DirectoryService.Application.Positions;
 using DirectoryService.Infrastructure.Postgres.Database;
 using DirectoryService.Infrastructure.Postgres.Departments;
 using DirectoryService.Infrastructure.Postgres.Locations;
+using DirectoryService.Infrastructure.Postgres.Positions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -32,6 +34,8 @@ public static class DependencyInjection
         services.AddScoped<ILocationsQueryRepository, SqlLocationsQueryRepository>();
         services.AddScoped<IDepartmentsCommandRepository, EfCoreDepartmentsCommandRepository>();
         services.AddScoped<IDepartmentsQueryRepository, SqlDepartmentsQueryRepository>();
+        services.AddScoped<IPositionsCommandRepository, EfCorePositionsCommandRepository>();
+        services.AddScoped<IPositionsQueryRepository, SqlPositionsQueryRepository>();
 
         return services;
     }

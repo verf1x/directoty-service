@@ -13,4 +13,8 @@ public interface IDepartmentsQueryRepository
     Task<bool> DepartmentWithIdentifierExistsAsync(
         string identifier,
         CancellationToken cancellationToken);
+
+    Task<bool> DepartmentActiveByIdAsync(
+        Guid id,
+        CancellationToken cancellationToken);
 }

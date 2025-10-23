@@ -44,7 +44,7 @@ public class SqlDepartmentsQueryRepository : IDepartmentsQueryRepository
         using var connection = await _dbConnectionFactory.CreateConnectionAsync(cancellationToken);
 
         const string query = """
-                             SELECT EXISTS (
+                             SELECT EXISTS(
                                 SELECT 1 FROM Departments 
                                 WHERE identifier = @Identifier);
                              """;
@@ -52,5 +52,22 @@ public class SqlDepartmentsQueryRepository : IDepartmentsQueryRepository
         var parameters = new { Identifier = identifier };
 
         return await connection.ExecuteScalarAsync<bool>(query, parameters);
+    }
+
+    public async Task<bool> DepartmentActiveByIdAsync(
+        Guid id,
+        CancellationToken cancellationToken)
+    {
+        using var connection = await _dbConnectionFactory.CreateConnectionAsync(cancellationToken);
+
+        const string query = """
+                             SELECT EXISTS(
+                                SELECT 1 FROM Departments
+                                WHERE "Id" = @Id
+                                AND is_active = true
+                             )
+                             """;
+
+        return await connection.ExecuteScalarAsync<bool>(query, new { Id = id });
     }
 }

@@ -27,9 +27,7 @@ public class SqlLocationsQueryRepository : ILocationsQueryRepository
                              )
                              """;
 
-        var sqlParams = new { Name = locationName.Value };
-
-        return await connection.ExecuteScalarAsync<bool>(query, sqlParams);
+        return await connection.ExecuteScalarAsync<bool>(query, new { Name = locationName.Value });
     }
 
     public async Task<bool> LocationOnAddressExistsAsync(
@@ -52,7 +50,7 @@ public class SqlLocationsQueryRepository : ILocationsQueryRepository
                              )
                              """;
 
-        var sqlParams = new
+        var parameters = new
         {
             address.PostalCode,
             address.Region,
@@ -64,7 +62,7 @@ public class SqlLocationsQueryRepository : ILocationsQueryRepository
             address.Apartment,
         };
 
-        return await connection.ExecuteScalarAsync<bool>(query, sqlParams);
+        return await connection.ExecuteScalarAsync<bool>(query, parameters);
     }
 
     public async Task<bool> LocationExistsByIdAsync(
@@ -80,8 +78,6 @@ public class SqlLocationsQueryRepository : ILocationsQueryRepository
                              )
                              """;
 
-        var sqlParams = new { Id = locationId };
-
-        return await connection.ExecuteScalarAsync<bool>(query, sqlParams);
+        return await connection.ExecuteScalarAsync<bool>(query, new { Id = locationId });
     }
 }
