@@ -1,19 +1,51 @@
 ﻿using CSharpFunctionalExtensions;
 using Dapper;
 using DirectoryService.Application.Departments;
-using DirectoryService.Application.Departments.Dtos;
+using DirectoryService.Contracts.Departments;
+using DirectoryService.Domain.Departments;
 using DirectoryService.Domain.Shared;
 using DirectoryService.Infrastructure.Postgres.Database;
+using Microsoft.Extensions.Logging;
 
 namespace DirectoryService.Infrastructure.Postgres.Departments;
 
-public class SqlDepartmentsQueryRepository : IDepartmentsQueryRepository
+public class DepartmentsRepository : IDepartmentsRepository
 {
+    private readonly DirectoryServiceWriteDbContext _writeDbContext;
     private readonly IDbConnectionFactory _dbConnectionFactory;
+    private readonly ILogger<DepartmentsRepository> _logger;
 
-    public SqlDepartmentsQueryRepository(IDbConnectionFactory dbConnectionFactory)
+    public DepartmentsRepository(
+        DirectoryServiceWriteDbContext writeDbContext,
+        IDbConnectionFactory dbConnectionFactory,
+        ILogger<DepartmentsRepository> logger)
     {
+        _writeDbContext = writeDbContext;
         _dbConnectionFactory = dbConnectionFactory;
+        _logger = logger;
+    }
+
+    public async Task<Result<Guid, Error>> AddAsync(Department department, CancellationToken cancellationToken)
+    {
+        try
+        {
+            await _writeDbContext.Departments.AddAsync(department, cancellationToken);
+
+            await _writeDbContext.SaveChangesAsync(cancellationToken);
+
+            return department.Id.Value;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(
+                ex,
+                "Error adding department with ID {DepartmentId} to the database",
+                department.Id.Value);
+
+            return Error.Failure(
+                "department.insert",
+                "An error occurred while adding the department to the database.");
+        }
     }
 
     public async Task<Result<DepartmentParentDto, Error>> GetDepartmentParentAsync(

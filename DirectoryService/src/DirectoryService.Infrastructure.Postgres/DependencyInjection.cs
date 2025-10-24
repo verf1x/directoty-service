@@ -18,7 +18,7 @@ public static class DependencyInjection
         this IServiceCollection services,
         IConfiguration configuration)
     {
-        services.AddDbContext<DirectoryServiceDbContext>((serviceProvider, options) =>
+        services.AddDbContext<DirectoryServiceWriteDbContext>((serviceProvider, options) =>
         {
             options.UseNpgsql(configuration["DirectoryServiceDb"]);
 
@@ -30,12 +30,9 @@ public static class DependencyInjection
 
         services.AddSingleton<IDbConnectionFactory, NpgSqlConnectionFactory>();
 
-        services.AddScoped<ILocationsCommandRepository, EfCoreLocationsCommandRepository>();
-        services.AddScoped<ILocationsQueryRepository, SqlLocationsQueryRepository>();
-        services.AddScoped<IDepartmentsCommandRepository, EfCoreDepartmentsCommandRepository>();
-        services.AddScoped<IDepartmentsQueryRepository, SqlDepartmentsQueryRepository>();
-        services.AddScoped<IPositionsCommandRepository, EfCorePositionsCommandRepository>();
-        services.AddScoped<IPositionsQueryRepository, SqlPositionsQueryRepository>();
+        services.AddScoped<ILocationsRepository, LocationsRepository>();
+        services.AddScoped<IDepartmentsRepository, DepartmentsRepository>();
+        services.AddScoped<IPositionsRepository, PositionsRepository>();
 
         return services;
     }

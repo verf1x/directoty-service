@@ -1,4 +1,4 @@
-﻿namespace DirectoryService.Contracts.Requests;
+﻿namespace DirectoryService.Contracts.Departments;
 
 public record CreateDepartmentRequest(
     string Name,

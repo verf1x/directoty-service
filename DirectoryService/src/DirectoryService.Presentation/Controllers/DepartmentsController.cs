@@ -1,5 +1,6 @@
 ﻿using DirectoryService.Application.Abstractions;
 using DirectoryService.Application.Departments.Create;
+using DirectoryService.Contracts.Departments;
 using DirectoryService.Contracts.Requests;
 using DirectoryService.Domain.Shared;
 using DirectoryService.Presentation.Response;

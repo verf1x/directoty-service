@@ -1,11 +1,14 @@
 ﻿using CSharpFunctionalExtensions;
-using DirectoryService.Application.Departments.Dtos;
+using DirectoryService.Contracts.Departments;
+using DirectoryService.Domain.Departments;
 using DirectoryService.Domain.Shared;
 
 namespace DirectoryService.Application.Departments;
 
-public interface IDepartmentsQueryRepository
+public interface IDepartmentsRepository
 {
+    Task<Result<Guid, Error>> AddAsync(Department department, CancellationToken cancellationToken);
+
     Task<Result<DepartmentParentDto, Error>> GetDepartmentParentAsync(
         Guid parentId,
         CancellationToken cancellationToken);

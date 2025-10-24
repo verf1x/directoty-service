@@ -14,23 +14,19 @@ namespace DirectoryService.Application.Positions.Create;
 public class CreatePositionHandler : ICommandHandler<CreatePositionCommand, Guid>
 {
     private readonly IValidator<CreatePositionCommand> _validator;
-    private readonly IPositionsQueryRepository _positionsQueryRepository;
-    private readonly IDepartmentsQueryRepository _departmentsQueryRepository;
-    private readonly IPositionsCommandRepository _positionsCommandRepository;
+    private readonly IDepartmentsRepository _departmentsRepository;
+    private readonly IPositionsRepository _positionsRepository;
     private readonly ILogger<CreatePositionHandler> _logger;
 
     public CreatePositionHandler(
         IValidator<CreatePositionCommand> validator,
-        IPositionsQueryRepository positionsQueryRepository,
-        IDepartmentsQueryRepository departmentsQueryRepository,
-        IPositionsCommandRepository positionsCommandRepository,
+        IDepartmentsRepository departmentsRepository,
+        IPositionsRepository positionsRepository,
         ILogger<CreatePositionHandler> logger)
     {
         _validator = validator;
-        _positionsQueryRepository = positionsQueryRepository;
-        _departmentsQueryRepository = departmentsQueryRepository;
-        _positionsCommandRepository = positionsCommandRepository;
-        _positionsCommandRepository = positionsCommandRepository;
+        _departmentsRepository = departmentsRepository;
+        _positionsRepository = positionsRepository;
         _logger = logger;
     }
 
@@ -43,7 +39,7 @@ public class CreatePositionHandler : ICommandHandler<CreatePositionCommand, Guid
             return validationResult.ToErrors();
 
         bool positionWithNameAlreadyActive =
-            await _positionsQueryRepository.IsPositionWithNameAlreadyActive(command.Name, cancellationToken);
+            await _positionsRepository.IsPositionWithNameAlreadyActive(command.Name, cancellationToken);
 
         if (positionWithNameAlreadyActive)
             return Errors.General.Conflict().ToErrors();
@@ -52,7 +48,7 @@ public class CreatePositionHandler : ICommandHandler<CreatePositionCommand, Guid
 
         bool departmentIdsValid = (await Task.WhenAll(
                 command.DepartmentIds.Select(d =>
-                    _departmentsQueryRepository.DepartmentActiveByIdAsync(d, cancellationToken))))
+                    _departmentsRepository.DepartmentActiveByIdAsync(d, cancellationToken))))
             .All(exists => exists);
 
         if (!departmentIdsValid)
@@ -69,7 +65,7 @@ public class CreatePositionHandler : ICommandHandler<CreatePositionCommand, Guid
 
         var position = new Position(positionId, name, description, departmentPositions);
 
-        var result = await _positionsCommandRepository.AddAsync(position, cancellationToken);
+        var result = await _positionsRepository.AddAsync(position, cancellationToken);
         if (result.IsFailure)
             return result.Error.ToErrors();
 

@@ -1,9 +1,13 @@
-﻿using DirectoryService.Domain.Locations;
+﻿using CSharpFunctionalExtensions;
+using DirectoryService.Domain.Locations;
+using DirectoryService.Domain.Shared;
 
 namespace DirectoryService.Application.Locations;
 
-public interface ILocationsQueryRepository
+public interface ILocationsRepository
 {
+    Task<Result<Guid, Error>> AddAsync(Location location, CancellationToken cancellationToken);
+
     Task<bool> LocationWithNameExistsAsync(
         LocationName locationName,
         CancellationToken cancellationToken);

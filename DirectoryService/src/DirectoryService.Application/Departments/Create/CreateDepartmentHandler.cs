@@ -15,22 +15,19 @@ namespace DirectoryService.Application.Departments.Create;
 public sealed class CreateDepartmentHandler : ICommandHandler<CreateDepartmentCommand, Guid>
 {
     private readonly IValidator<CreateDepartmentCommand> _validator;
-    private readonly ILocationsQueryRepository _locationsRepository;
-    private readonly IDepartmentsQueryRepository _departmentsQueryRepository;
-    private readonly IDepartmentsCommandRepository _departmentsCommandRepository;
+    private readonly ILocationsRepository _locationsRepository;
+    private readonly IDepartmentsRepository _departmentsRepository;
     private readonly ILogger<CreateDepartmentHandler> _logger;
 
     public CreateDepartmentHandler(
         IValidator<CreateDepartmentCommand> validator,
-        ILocationsQueryRepository locationsRepository,
-        IDepartmentsQueryRepository departmentsQueryRepository,
-        IDepartmentsCommandRepository departmentsCommandRepository,
+        ILocationsRepository locationsRepository,
+        IDepartmentsRepository departmentsRepository,
         ILogger<CreateDepartmentHandler> logger)
     {
         _validator = validator;
         _locationsRepository = locationsRepository;
-        _departmentsQueryRepository = departmentsQueryRepository;
-        _departmentsCommandRepository = departmentsCommandRepository;
+        _departmentsRepository = departmentsRepository;
         _logger = logger;
     }
 
@@ -69,7 +66,7 @@ public sealed class CreateDepartmentHandler : ICommandHandler<CreateDepartmentCo
             department = rootDepartmentResult.Value;
         }
 
-        var result = await _departmentsCommandRepository.AddAsync(department, cancellationToken);
+        var result = await _departmentsRepository.AddAsync(department, cancellationToken);
 
         if (result.IsFailure)
             return result.Error.ToErrors();
@@ -83,7 +80,7 @@ public sealed class CreateDepartmentHandler : ICommandHandler<CreateDepartmentCo
         CreateDepartmentCommand command, CancellationToken cancellationToken)
     {
         bool isUniqueIdentifier =
-            !await _departmentsQueryRepository.DepartmentWithIdentifierExistsAsync(
+            !await _departmentsRepository.DepartmentWithIdentifierExistsAsync(
                 command.Identifier,
                 cancellationToken);
 
@@ -110,13 +107,13 @@ public sealed class CreateDepartmentHandler : ICommandHandler<CreateDepartmentCo
         CancellationToken cancellationToken)
     {
         var parentDepartmentDtoResult =
-            await _departmentsQueryRepository.GetDepartmentParentAsync(command.ParentId!.Value, cancellationToken);
+            await _departmentsRepository.GetDepartmentParentAsync(command.ParentId!.Value, cancellationToken);
 
         if (parentDepartmentDtoResult.IsFailure)
             return parentDepartmentDtoResult.Error.ToErrors();
 
         bool isUniqueIdentifier =
-            !await _departmentsQueryRepository.DepartmentWithIdentifierExistsAsync(
+            !await _departmentsRepository.DepartmentWithIdentifierExistsAsync(
                 command.Identifier,
                 cancellationToken);
 

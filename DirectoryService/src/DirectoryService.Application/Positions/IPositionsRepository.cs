@@ -4,7 +4,10 @@ using DirectoryService.Domain.Shared;
 
 namespace DirectoryService.Application.Positions;
 
-public interface IPositionsCommandRepository
+public interface IPositionsRepository
 {
     Task<Result<Guid, Error>> AddAsync(Position position, CancellationToken cancellationToken);
+
+    Task<bool> IsPositionWithNameAlreadyActive(
+        string positionName, CancellationToken cancellationToken);
 }

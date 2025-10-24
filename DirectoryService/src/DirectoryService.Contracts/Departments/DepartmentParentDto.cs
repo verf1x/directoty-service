@@ -1,4 +1,4 @@
-﻿namespace DirectoryService.Application.Departments.Dtos;
+﻿namespace DirectoryService.Contracts.Departments;
 
 public class DepartmentParentDto
 {

@@ -1,17 +1,50 @@
-﻿using Dapper;
+﻿using CSharpFunctionalExtensions;
+using Dapper;
 using DirectoryService.Application.Locations;
 using DirectoryService.Domain.Locations;
+using DirectoryService.Domain.Shared;
 using DirectoryService.Infrastructure.Postgres.Database;
+using Microsoft.Extensions.Logging;
 
 namespace DirectoryService.Infrastructure.Postgres.Locations;
 
-public class SqlLocationsQueryRepository : ILocationsQueryRepository
+public sealed class LocationsRepository : ILocationsRepository
 {
+    private readonly DirectoryServiceWriteDbContext _writeDbContext;
     private readonly IDbConnectionFactory _dbConnectionFactory;
+    private readonly ILogger<LocationsRepository> _logger;
 
-    public SqlLocationsQueryRepository(IDbConnectionFactory dbConnectionFactory)
+    public LocationsRepository(
+        DirectoryServiceWriteDbContext writeDbContext,
+        IDbConnectionFactory dbConnectionFactory,
+        ILogger<LocationsRepository> logger)
     {
+        _writeDbContext = writeDbContext;
         _dbConnectionFactory = dbConnectionFactory;
+        _logger = logger;
+    }
+
+    public async Task<Result<Guid, Error>> AddAsync(Location location, CancellationToken cancellationToken)
+    {
+        try
+        {
+            await _writeDbContext.Locations.AddAsync(location, cancellationToken);
+
+            await _writeDbContext.SaveChangesAsync(cancellationToken);
+
+            return location.Id.Value;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(
+                ex,
+                "Error adding location with ID {LocationId} to the database",
+                location.Id.Value);
+
+            return Error.Failure(
+                "location.insert",
+                "An error occurred while adding the location to the database.");
+        }
     }
 
     public async Task<bool> LocationWithNameExistsAsync(

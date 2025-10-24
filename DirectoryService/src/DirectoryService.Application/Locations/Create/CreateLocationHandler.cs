@@ -12,19 +12,16 @@ namespace DirectoryService.Application.Locations.Create;
 public sealed class CreateLocationHandler : ICommandHandler<CreateLocationCommand, Guid>
 {
     private readonly IValidator<CreateLocationCommand> _validator;
-    private readonly ILocationsCommandRepository _locationsCommandRepository;
-    private readonly ILocationsQueryRepository _locationsQueryRepository;
+    private readonly ILocationsRepository _locationsRepository;
     private readonly ILogger<CreateLocationHandler> _logger;
 
     public CreateLocationHandler(
         IValidator<CreateLocationCommand> validator,
-        ILocationsCommandRepository locationsCommandRepository,
-        ILocationsQueryRepository locationsQueryRepository,
+        ILocationsRepository locationsRepository,
         ILogger<CreateLocationHandler> logger)
     {
         _validator = validator;
-        _locationsCommandRepository = locationsCommandRepository;
-        _locationsQueryRepository = locationsQueryRepository;
+        _locationsRepository = locationsRepository;
         _logger = logger;
     }
 
@@ -38,7 +35,7 @@ public sealed class CreateLocationHandler : ICommandHandler<CreateLocationComman
 
         var locationName = LocationName.Create(command.Name).Value;
 
-        bool isLocationWithNameExists = await _locationsQueryRepository
+        bool isLocationWithNameExists = await _locationsRepository
             .LocationWithNameExistsAsync(locationName, cancellationToken);
 
         if (isLocationWithNameExists)
@@ -58,7 +55,7 @@ public sealed class CreateLocationHandler : ICommandHandler<CreateLocationComman
             command.Building,
             command.Apartment).Value;
 
-        bool isLocationOnAddressExists = await _locationsQueryRepository
+        bool isLocationOnAddressExists = await _locationsRepository
             .LocationOnAddressExistsAsync(address, cancellationToken);
 
         if (isLocationOnAddressExists)
@@ -72,7 +69,7 @@ public sealed class CreateLocationHandler : ICommandHandler<CreateLocationComman
 
         var location = new Location(locationName, address, timeZone);
 
-        var addResult = await _locationsCommandRepository.AddAsync(location, cancellationToken);
+        var addResult = await _locationsRepository.AddAsync(location, cancellationToken);
         if (addResult.IsFailure)
             return addResult.Error.ToErrors();
 
