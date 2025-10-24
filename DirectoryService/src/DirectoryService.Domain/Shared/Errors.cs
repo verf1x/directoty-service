@@ -24,13 +24,13 @@ public static class Errors
         public static Error ValueIsRequired(string? name = null)
         {
             string label = name is null ? " " : " " + name + " ";
-            return Error.NotFound("value.is.required", $"invalid{label}length");
+            return Error.Validation("value.is.required", $"invalid{label}length");
         }
 
         public static Error Conflict(Guid? id = null)
         {
             string forId = id is null ? string.Empty : $" for id '{id}'";
-            return Error.NotFound("value.already.exists", $"value already exists{forId}");
+            return Error.Conflict("value.already.exists", $"value already exists{forId}");
         }
     }
 

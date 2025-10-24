@@ -35,13 +35,10 @@ public sealed class CreateLocationHandler : ICommandHandler<CreateLocationComman
 
         var locationName = LocationName.Create(command.Name).Value;
 
-        var existingLocationByNameResult = await _locationsRepository
-            .CheckIfLocationWithNameExistsAsync(locationName, cancellationToken);
+        bool isLocationWithNameExists = await _locationsRepository
+            .LocationWithNameExistsAsync(locationName, cancellationToken);
 
-        if (existingLocationByNameResult.IsFailure)
-            return existingLocationByNameResult.Error.ToErrors();
-
-        if (existingLocationByNameResult.Value)
+        if (isLocationWithNameExists)
         {
             return Error.Conflict(
                 "location.with.name.already.exists",
@@ -58,13 +55,10 @@ public sealed class CreateLocationHandler : ICommandHandler<CreateLocationComman
             command.Building,
             command.Apartment).Value;
 
-        var existingLocationByAddressResult = await _locationsRepository
-            .CheckIfLocationOnAddressExistsAsync(address, cancellationToken);
+        bool isLocationOnAddressExists = await _locationsRepository
+            .LocationOnAddressExistsAsync(address, cancellationToken);
 
-        if (existingLocationByAddressResult.IsFailure)
-            return existingLocationByAddressResult.Error.ToErrors();
-
-        if (existingLocationByAddressResult.Value)
+        if (isLocationOnAddressExists)
         {
             return Error.Conflict(
                 "location.on.address.already.exists",

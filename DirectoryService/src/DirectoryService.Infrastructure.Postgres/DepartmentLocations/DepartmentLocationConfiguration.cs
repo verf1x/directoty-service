@@ -4,7 +4,7 @@ using DirectoryService.Domain.Locations;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace DirectoryService.Infrastructure.Postgres.Configurations;
+namespace DirectoryService.Infrastructure.Postgres.DepartmentLocations;
 
 public sealed class DepartmentLocationConfiguration : IEntityTypeConfiguration<DepartmentLocation>
 {

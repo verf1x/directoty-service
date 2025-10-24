@@ -1,5 +1,4 @@
 ﻿using CSharpFunctionalExtensions;
-using DirectoryService.Domain;
 using DirectoryService.Domain.Locations;
 using DirectoryService.Domain.Shared;
 
@@ -9,7 +8,13 @@ public interface ILocationsRepository
 {
     Task<Result<Guid, Error>> AddAsync(Location location, CancellationToken cancellationToken);
 
-    Task<Result<bool, Error>> CheckIfLocationWithNameExistsAsync(LocationName locationName, CancellationToken cancellationToken);
+    Task<bool> LocationWithNameExistsAsync(
+        LocationName locationName,
+        CancellationToken cancellationToken);
 
-    Task<Result<bool, Error>> CheckIfLocationOnAddressExistsAsync(Address address, CancellationToken cancellationToken);
+    Task<bool> LocationOnAddressExistsAsync(Address address, CancellationToken cancellationToken);
+
+    Task<bool> LocationExistsByIdAsync(
+        Guid locationId,
+        CancellationToken cancellationToken);
 }

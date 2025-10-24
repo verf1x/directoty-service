@@ -6,11 +6,16 @@ public sealed class Position
 {
     private readonly List<DepartmentPosition> _departmentPositions = [];
 
-    public Position(PositionName name, Description description)
+    public Position(
+        PositionId id,
+        PositionName name,
+        Description? description,
+        IEnumerable<DepartmentPosition> departmentPositions)
     {
-        Id = PositionId.CreateNew();
+        Id = id;
         Name = name;
         Description = description;
+        _departmentPositions = departmentPositions.ToList();
         IsActive = true;
         CreatedAt = DateTime.UtcNow;
     }
@@ -24,7 +29,7 @@ public sealed class Position
 
     public PositionName Name { get; private set; } = null!;
 
-    public Description Description { get; private set; } = null!;
+    public Description? Description { get; private set; }
 
     public bool IsActive { get; private set; }
 

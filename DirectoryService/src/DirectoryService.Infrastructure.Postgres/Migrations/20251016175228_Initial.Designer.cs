@@ -12,7 +12,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 namespace DirectoryService.Infrastructure.Postgres.Migrations
 {
-    [DbContext(typeof(DirectoryServiceDbContext))]
+    [DbContext(typeof(DirectoryServiceWriteDbContext))]
     [Migration("20251016175228_Initial")]
     partial class Initial
     {

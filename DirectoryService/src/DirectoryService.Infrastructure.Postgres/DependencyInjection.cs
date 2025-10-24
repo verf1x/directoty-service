@@ -1,5 +1,10 @@
+using DirectoryService.Application.Departments;
 using DirectoryService.Application.Locations;
-using DirectoryService.Infrastructure.Postgres.Repositories;
+using DirectoryService.Application.Positions;
+using DirectoryService.Infrastructure.Postgres.Database;
+using DirectoryService.Infrastructure.Postgres.Departments;
+using DirectoryService.Infrastructure.Postgres.Locations;
+using DirectoryService.Infrastructure.Postgres.Positions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -13,7 +18,7 @@ public static class DependencyInjection
         this IServiceCollection services,
         IConfiguration configuration)
     {
-        services.AddDbContext<DirectoryServiceDbContext>((serviceProvider, options) =>
+        services.AddDbContext<DirectoryServiceWriteDbContext>((serviceProvider, options) =>
         {
             options.UseNpgsql(configuration["DirectoryServiceDb"]);
 
@@ -23,7 +28,11 @@ public static class DependencyInjection
             options.EnableDetailedErrors();
         });
 
-        services.AddScoped<ILocationsRepository, EfCoreLocationsRepository>();
+        services.AddSingleton<IDbConnectionFactory, NpgSqlConnectionFactory>();
+
+        services.AddScoped<ILocationsRepository, LocationsRepository>();
+        services.AddScoped<IDepartmentsRepository, DepartmentsRepository>();
+        services.AddScoped<IPositionsRepository, PositionsRepository>();
 
         return services;
     }

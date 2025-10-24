@@ -2,7 +2,7 @@ using DirectoryService.Domain.Departments;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace DirectoryService.Infrastructure.Postgres.Configurations;
+namespace DirectoryService.Infrastructure.Postgres.Departments;
 
 public sealed class DepartmentConfiguration : IEntityTypeConfiguration<Department>
 {

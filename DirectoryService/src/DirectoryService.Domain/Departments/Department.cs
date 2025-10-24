@@ -11,17 +11,22 @@ public sealed class Department
     private readonly List<DepartmentPosition> _departmentPositions = [];
 
     private Department(
+        DepartmentId departmentId,
         DepartmentName name,
         Identifier identifier,
-        short depth,
-        Department? parent = null)
+        List<DepartmentLocation> departmentLocations,
+        short depth = 0,
+        DepartmentId? parentId = null,
+        Path? path = null)
     {
-        Id = DepartmentId.CreateNew();
+        Id = departmentId;
         Name = name;
         Identifier = identifier;
+        _departmentLocations = departmentLocations;
         Depth = depth;
+        ParentId = parentId;
+        Path = path ?? Path.Create(identifier.Value).Value;
         IsActive = true;
-        ParentId = parent?.Id;
         CreatedAt = DateTime.UtcNow;
     }
 
@@ -52,21 +57,38 @@ public sealed class Department
 
     public IReadOnlyList<DepartmentPosition> DepartmentPositions => _departmentPositions.AsReadOnly();
 
-    public static Result<Department, Error> Create(
+    public static Result<Department, Error> CreateRoot(
+        DepartmentId departmentId,
         DepartmentName name,
         Identifier identifier,
-        short depth,
-        Department? parent = null)
+        IEnumerable<DepartmentLocation> departmentLocations)
     {
-        if (depth < 0)
-            return Errors.General.ValueIsInvalid(nameof(depth));
-
-        var department = new Department(
+        return new Department(
+            departmentId,
             name,
             identifier,
-            depth,
-            parent);
+            departmentLocations.ToList());
+    }
 
-        return department;
+    public static Result<Department, Error> CreateChild(
+        DepartmentId departmentId,
+        DepartmentName name,
+        Identifier identifier,
+        DepartmentId parentId,
+        Path path,
+        short depth,
+        IEnumerable<DepartmentLocation> departmentLocations)
+    {
+        if (depth <= 1)
+            return Errors.General.ValueIsInvalid(nameof(depth));
+
+        return new Department(
+            departmentId,
+            name,
+            identifier,
+            departmentLocations.ToList(),
+            depth,
+            parentId,
+            path);
     }
 }

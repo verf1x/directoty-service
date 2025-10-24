@@ -2,7 +2,7 @@ using DirectoryService.Domain.Positions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace DirectoryService.Infrastructure.Postgres.Configurations;
+namespace DirectoryService.Infrastructure.Postgres.Positions;
 
 public sealed class PositionConfiguration : IEntityTypeConfiguration<Position>
 {
@@ -25,13 +25,14 @@ public sealed class PositionConfiguration : IEntityTypeConfiguration<Position>
                 .IsRequired();
         });
 
-        builder.ComplexProperty(p => p.Description, pdb =>
+        builder.OwnsOne(p => p.Description, pdb =>
         {
             pdb.Property(pd => pd.Value)
                 .HasColumnName("description")
-                .HasMaxLength(5000)
-                .IsRequired(false);
+                .HasMaxLength(5000);
         });
+
+        builder.Navigation(p => p.Description).IsRequired(false);
 
         builder.Property(p => p.IsActive)
             .HasColumnName("is_active")

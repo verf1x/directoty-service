@@ -4,7 +4,7 @@ using DirectoryService.Domain.Positions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace DirectoryService.Infrastructure.Postgres.Configurations;
+namespace DirectoryService.Infrastructure.Postgres.DepartmentPositions;
 
 public sealed class DepartmentPositionConfiguration : IEntityTypeConfiguration<DepartmentPosition>
 {
