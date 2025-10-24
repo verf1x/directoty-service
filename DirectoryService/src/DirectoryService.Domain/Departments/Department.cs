@@ -80,7 +80,7 @@ public sealed class Department
         IEnumerable<DepartmentLocation> departmentLocations)
     {
         if (depth <= 1)
-            Errors.General.ValueIsInvalid(nameof(depth));
+            return Errors.General.ValueIsInvalid(nameof(depth));
 
         return new Department(
             departmentId,
