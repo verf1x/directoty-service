@@ -7,6 +7,9 @@ namespace DirectoryService.Application.Departments;
 
 public interface IDepartmentsRepository
 {
+    Task<Result<Department, Error>> GetByIdWithLocationsAsync(DepartmentId departmentId,
+        CancellationToken cancellationToken);
+
     Task<Result<Guid, Error>> AddAsync(Department department, CancellationToken cancellationToken);
 
     Task<Result<DepartmentParentDto, Error>> GetDepartmentParentAsync(
@@ -19,5 +22,13 @@ public interface IDepartmentsRepository
 
     Task<bool> DepartmentActiveByIdAsync(
         Guid id,
+        CancellationToken cancellationToken);
+
+    Task DeleteLocationsByDepartmentIdAsync(
+        DepartmentId departmentId,
+        CancellationToken cancellationToken);
+
+    Task<bool> LocationActiveByIdAsync(
+        Guid locationId,
         CancellationToken cancellationToken);
 }

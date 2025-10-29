@@ -5,9 +5,9 @@ using Microsoft.EntityFrameworkCore;
 
 namespace DirectoryService.Infrastructure.Postgres;
 
-public sealed class DirectoryServiceWriteDbContext : DbContext
+public sealed class DirectoryServiceDbContext : DbContext
 {
-    public DirectoryServiceWriteDbContext(DbContextOptions<DirectoryServiceWriteDbContext> options)
+    public DirectoryServiceDbContext(DbContextOptions<DirectoryServiceDbContext> options)
         : base(options)
     {
     }
@@ -20,6 +20,6 @@ public sealed class DirectoryServiceWriteDbContext : DbContext
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        modelBuilder.ApplyConfigurationsFromAssembly(typeof(DirectoryServiceWriteDbContext).Assembly);
+        modelBuilder.ApplyConfigurationsFromAssembly(typeof(DirectoryServiceDbContext).Assembly);
     }
 }

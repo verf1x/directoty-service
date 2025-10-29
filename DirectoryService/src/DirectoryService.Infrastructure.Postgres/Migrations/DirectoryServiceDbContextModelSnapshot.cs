@@ -11,7 +11,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 namespace DirectoryService.Infrastructure.Postgres.Migrations
 {
-    [DbContext(typeof(DirectoryServiceWriteDbContext))]
+    [DbContext(typeof(DirectoryServiceDbContext))]
     partial class DirectoryServiceDbContextModelSnapshot : ModelSnapshot
     {
         protected override void BuildModel(ModelBuilder modelBuilder)

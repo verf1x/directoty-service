@@ -10,16 +10,16 @@ namespace DirectoryService.Infrastructure.Postgres.Locations;
 
 public sealed class LocationsRepository : ILocationsRepository
 {
-    private readonly DirectoryServiceWriteDbContext _writeDbContext;
+    private readonly DirectoryServiceDbContext _dbContext;
     private readonly IDbConnectionFactory _dbConnectionFactory;
     private readonly ILogger<LocationsRepository> _logger;
 
     public LocationsRepository(
-        DirectoryServiceWriteDbContext writeDbContext,
+        DirectoryServiceDbContext dbContext,
         IDbConnectionFactory dbConnectionFactory,
         ILogger<LocationsRepository> logger)
     {
-        _writeDbContext = writeDbContext;
+        _dbContext = dbContext;
         _dbConnectionFactory = dbConnectionFactory;
         _logger = logger;
     }
@@ -28,9 +28,9 @@ public sealed class LocationsRepository : ILocationsRepository
     {
         try
         {
-            await _writeDbContext.Locations.AddAsync(location, cancellationToken);
+            await _dbContext.Locations.AddAsync(location, cancellationToken);
 
-            await _writeDbContext.SaveChangesAsync(cancellationToken);
+            await _dbContext.SaveChangesAsync(cancellationToken);
 
             return location.Id.Value;
         }
