@@ -23,6 +23,13 @@ builder.Services.Configure<ApiBehaviorOptions>(options => options.SuppressModelS
 
 builder.Services.AddOpenApi(options =>
 {
+    options.AddDocumentTransformer((document, _, _) =>
+    {
+        document.Info = new OpenApiInfo { Title = "Directory Service API", Version = "v1", };
+
+        return Task.CompletedTask;
+    });
+
     options.AddSchemaTransformer((schema, context, _) =>
     {
         if (context.JsonTypeInfo.Type == typeof(Envelope<ErrorList>))

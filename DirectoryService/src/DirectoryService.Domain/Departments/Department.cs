@@ -91,4 +91,14 @@ public sealed class Department
             parentId,
             path);
     }
+
+    public UnitResult<Error> UpdateLocations(IEnumerable<DepartmentLocation> departmentLocations)
+    {
+        _departmentLocations.Clear();
+        _departmentLocations.AddRange(departmentLocations);
+
+        UpdatedAt = DateTime.UtcNow;
+
+        return UnitResult.Success<Error>();
+    }
 }

@@ -1,3 +1,4 @@
+using DirectoryService.Application.Database;
 using DirectoryService.Application.Departments;
 using DirectoryService.Application.Locations;
 using DirectoryService.Application.Positions;
@@ -18,7 +19,9 @@ public static class DependencyInjection
         this IServiceCollection services,
         IConfiguration configuration)
     {
-        services.AddDbContext<DirectoryServiceWriteDbContext>((serviceProvider, options) =>
+        services.AddScoped<ITransactionManager, TransactionManager>();
+
+        services.AddDbContext<DirectoryServiceDbContext>((serviceProvider, options) =>
         {
             options.UseNpgsql(configuration["DirectoryServiceDb"]);
 

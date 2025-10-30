@@ -10,16 +10,16 @@ namespace DirectoryService.Infrastructure.Postgres.Positions;
 
 public class PositionsRepository : IPositionsRepository
 {
-    private readonly DirectoryServiceWriteDbContext _writeDbContext;
+    private readonly DirectoryServiceDbContext _dbContext;
     private readonly IDbConnectionFactory _dbConnectionFactory;
     private readonly ILogger<PositionsRepository> _logger;
 
     public PositionsRepository(
-        DirectoryServiceWriteDbContext writeDbContext,
+        DirectoryServiceDbContext dbContext,
         IDbConnectionFactory dbConnectionFactory,
         ILogger<PositionsRepository> logger)
     {
-        _writeDbContext = writeDbContext;
+        _dbContext = dbContext;
         _dbConnectionFactory = dbConnectionFactory;
         _logger = logger;
     }
@@ -28,9 +28,9 @@ public class PositionsRepository : IPositionsRepository
     {
         try
         {
-            await _writeDbContext.Positions.AddAsync(position, cancellationToken);
+            await _dbContext.Positions.AddAsync(position, cancellationToken);
 
-            await _writeDbContext.SaveChangesAsync(cancellationToken);
+            await _dbContext.SaveChangesAsync(cancellationToken);
 
             return position.Id.Value;
         }
