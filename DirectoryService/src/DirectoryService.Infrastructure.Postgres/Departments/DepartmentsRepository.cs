@@ -33,7 +33,6 @@ public class DepartmentsRepository : IDepartmentsRepository
     {
         var department = await _dbContext.Departments
             .Include(d => d.DepartmentLocations)
-            .ThenInclude(dl => dl.Location)
             .FirstOrDefaultAsync(d => d.Id == departmentId, cancellationToken);
 
         if (department is null)
@@ -90,7 +89,7 @@ public class DepartmentsRepository : IDepartmentsRepository
         return result;
     }
 
-    public async Task<bool> DepartmentWithIdentifierExistsAsync(
+    public async Task<bool> DepartmentWithIdentifierExistAsync(
         string identifier,
         CancellationToken cancellationToken)
     {
@@ -134,20 +133,46 @@ public class DepartmentsRepository : IDepartmentsRepository
             .ExecuteDeleteAsync(cancellationToken);
     }
 
-    public async Task<bool> LocationActiveByIdAsync(
-        Guid locationId,
+    public async Task<bool> LocationsExistByIdsAsync(
+        IEnumerable<LocationId> locationIds,
         CancellationToken cancellationToken)
     {
+        var locationIdsList = locationIds.Select(id => id.Value).ToList();
+
+        var connection = _dbContext.Database.GetDbConnection();
+
+        const string sql = """
+                           SELECT COUNT(*)
+                           FROM locations
+                           WHERE "Id" = ANY(@LocationIds)
+                           """;
+
+        int existingCount = await connection.ExecuteScalarAsync<int>(
+            sql,
+            new { LocationIds = locationIdsList });
+
+        return existingCount == locationIdsList.Count;
+    }
+
+    public async Task<bool> LocationsActiveByIdsAsync(
+        IEnumerable<LocationId> locationIds,
+        CancellationToken cancellationToken)
+    {
+        var locationIdsList = locationIds.Select(id => id.Value).ToList();
+
         using var connection = await _dbConnectionFactory.CreateConnectionAsync(cancellationToken);
 
-        const string query = """
-                             SELECT EXISTS(
-                                 SELECT 1 FROM Locations
-                                 WHERE "Id" = @Id
-                                 AND is_active = true
-                             )
-                             """;
+        const string sql = """
+                           SELECT COUNT(*)
+                           FROM locations
+                           WHERE "Id" = ANY(@LocationIds)
+                           AND is_active = true
+                           """;
 
-        return await connection.ExecuteScalarAsync<bool>(query, new { Id = locationId });
+        int activeCount = await connection.ExecuteScalarAsync<int>(
+            sql,
+            new { LocationIds = locationIdsList });
+
+        return activeCount == locationIdsList.Count;
     }
 }

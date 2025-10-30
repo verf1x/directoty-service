@@ -61,10 +61,9 @@ public class UpdateDepartmentLocationsHandler : ICommandHandler<UpdateDepartment
 
         var newLocations = command.LocationIds.Select(LocationId.Create).ToList();
 
-        bool newLocationsActive = (await Task.WhenAll(
-                newLocations.Select(locationId =>
-                    _departmentsRepository.LocationActiveByIdAsync(locationId, cancellationToken))))
-            .All(exists => exists);
+        bool newLocationsActive = await _departmentsRepository.LocationsActiveByIdsAsync(
+            newLocations,
+            cancellationToken);
 
         if (!newLocationsActive)
         {

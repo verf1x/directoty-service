@@ -1,6 +1,5 @@
 ﻿using CSharpFunctionalExtensions;
 using DirectoryService.Application.Abstractions;
-using DirectoryService.Application.Locations;
 using DirectoryService.Application.Validation;
 using DirectoryService.Domain.DepartmentLocations;
 using DirectoryService.Domain.Departments;
@@ -15,18 +14,15 @@ namespace DirectoryService.Application.Departments.Create;
 public sealed class CreateDepartmentHandler : ICommandHandler<CreateDepartmentCommand, Guid>
 {
     private readonly IValidator<CreateDepartmentCommand> _validator;
-    private readonly ILocationsRepository _locationsRepository;
     private readonly IDepartmentsRepository _departmentsRepository;
     private readonly ILogger<CreateDepartmentHandler> _logger;
 
     public CreateDepartmentHandler(
         IValidator<CreateDepartmentCommand> validator,
-        ILocationsRepository locationsRepository,
         IDepartmentsRepository departmentsRepository,
         ILogger<CreateDepartmentHandler> logger)
     {
         _validator = validator;
-        _locationsRepository = locationsRepository;
         _departmentsRepository = departmentsRepository;
         _logger = logger;
     }
@@ -39,10 +35,10 @@ public sealed class CreateDepartmentHandler : ICommandHandler<CreateDepartmentCo
         if (!validationResult.IsValid)
             return validationResult.ToErrors();
 
-        bool locationsExist = (await Task.WhenAll(
-                command.LocationIds.Select(locationId =>
-                    _locationsRepository.LocationExistsByIdAsync(locationId, cancellationToken))))
-            .All(exists => exists);
+        var locationIds = command.LocationIds.Select(LocationId.Create).ToList();
+
+        bool locationsExist = await _departmentsRepository
+            .LocationsExistByIdsAsync(locationIds, cancellationToken);
 
         if (!locationsExist)
             return Errors.General.NotFound().ToErrors();
@@ -80,7 +76,7 @@ public sealed class CreateDepartmentHandler : ICommandHandler<CreateDepartmentCo
         CreateDepartmentCommand command, CancellationToken cancellationToken)
     {
         bool isUniqueIdentifier =
-            !await _departmentsRepository.DepartmentWithIdentifierExistsAsync(
+            !await _departmentsRepository.DepartmentWithIdentifierExistAsync(
                 command.Identifier,
                 cancellationToken);
 
@@ -113,7 +109,7 @@ public sealed class CreateDepartmentHandler : ICommandHandler<CreateDepartmentCo
             return parentDepartmentDtoResult.Error.ToErrors();
 
         bool isUniqueIdentifier =
-            !await _departmentsRepository.DepartmentWithIdentifierExistsAsync(
+            !await _departmentsRepository.DepartmentWithIdentifierExistAsync(
                 command.Identifier,
                 cancellationToken);
 
