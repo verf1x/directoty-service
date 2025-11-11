@@ -1,8 +1,13 @@
-﻿namespace DirectoryService.Presentation.Extensions;
+﻿#pragma warning disable SA1137
+
+namespace DirectoryService.Presentation.Extensions;
 
 public static class WebApplicationBuilderExtensions
 {
-    public static string GetSeqConnectionString(this WebApplicationBuilder builder) =>
-        builder.Configuration.GetConnectionString("Seq")
-        ?? throw new ArgumentNullException("Seq");
+    extension(WebApplicationBuilder builder)
+    {
+        public string GetSeqConnectionString() =>
+            builder.Configuration.GetConnectionString("Seq")
+            ?? throw new ArgumentNullException("Seq");
+    }
 }

@@ -6,18 +6,19 @@ namespace DirectoryService.Application;
 
 public static class DependencyInjection
 {
-    public static IServiceCollection AddApplication(this IServiceCollection services)
+    extension(IServiceCollection services)
     {
-        return services
-            .AddCommands()
-            .AddValidatorsFromAssembly(typeof(DependencyInjection).Assembly);
-    }
+        public IServiceCollection AddApplication()
+            => services
+                .AddCommands()
+                .AddValidatorsFromAssembly(typeof(DependencyInjection).Assembly);
 
-    private static IServiceCollection AddCommands(this IServiceCollection services) =>
-        services.Scan(scan => scan.FromAssemblies(typeof(DependencyInjection).Assembly)
-            .AddClasses(classes => classes.AssignableToAny(
-                typeof(ICommandHandler<,>),
-                typeof(ICommandHandler<>)))
-            .AsSelfWithInterfaces()
-            .WithScopedLifetime());
+        private IServiceCollection AddCommands()
+            => services.Scan(scan => scan.FromAssemblies(typeof(DependencyInjection).Assembly)
+                .AddClasses(classes => classes.AssignableToAny(
+                    typeof(ICommandHandler<,>),
+                    typeof(ICommandHandler<>)))
+                .AsSelfWithInterfaces()
+                .WithScopedLifetime());
+    }
 }
