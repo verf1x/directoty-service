@@ -1,5 +1,4 @@
-﻿using DirectoryService.Domain;
-using DirectoryService.Domain.Shared;
+﻿using DirectoryService.Domain.Shared;
 using DirectoryService.Presentation.Response;
 
 namespace DirectoryService.Presentation.Middlewares;
@@ -38,7 +37,9 @@ public sealed class ExceptionMiddleware
 
 public static class ExceptionMiddlewareExtensions
 {
-    public static IApplicationBuilder UseExceptionMiddleware(
-        this IApplicationBuilder builder) =>
-        builder.UseMiddleware<ExceptionMiddleware>();
+    extension(IApplicationBuilder builder)
+    {
+        public IApplicationBuilder UseExceptionMiddleware()
+            => builder.UseMiddleware<ExceptionMiddleware>();
+    }
 }

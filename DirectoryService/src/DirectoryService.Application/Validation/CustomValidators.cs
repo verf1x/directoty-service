@@ -6,21 +6,24 @@ namespace DirectoryService.Application.Validation;
 
 public static class CustomValidators
 {
-    public static IRuleBuilderOptionsConditions<T, TElement> MustBeValueObject<T, TElement, TValueObject>(
-        this IRuleBuilder<T, TElement> ruleBuilder,
-        Func<TElement, Result<TValueObject, Error>> factoryMethod) =>
-        ruleBuilder.Custom((value, context) =>
-        {
-            Result<TValueObject, Error> result = factoryMethod(value);
+    extension<T, TElement>(IRuleBuilder<T, TElement> ruleBuilder)
+    {
+        public IRuleBuilderOptionsConditions<T, TElement> MustBeValueObject<TValueObject>(
+            Func<TElement, Result<TValueObject, Error>> factoryMethod) =>
+            ruleBuilder.Custom((value, context) =>
+            {
+                Result<TValueObject, Error> result = factoryMethod(value);
 
-            if (result.IsSuccess)
-                return;
+                if (result.IsSuccess)
+                    return;
 
-            context.AddFailure(result.Error.Serialize());
-        });
+                context.AddFailure(result.Error.Serialize());
+            });
+    }
 
-    public static IRuleBuilder<T, TProperty> WithError<T, TProperty>(
-        this IRuleBuilderOptions<T, TProperty> rule,
-        Error error)
-        => rule.WithMessage(error.Serialize());
+    extension<T, TProperty>(IRuleBuilderOptions<T, TProperty> rule)
+    {
+        public IRuleBuilder<T, TProperty> WithError(Error error)
+            => rule.WithMessage(error.Serialize());
+    }
 }

@@ -15,28 +15,29 @@ namespace DirectoryService.Infrastructure.Postgres;
 
 public static class DependencyInjection
 {
-    public static IServiceCollection AddInfrastructure(
-        this IServiceCollection services,
-        IConfiguration configuration)
+    extension(IServiceCollection services)
     {
-        services.AddScoped<ITransactionManager, TransactionManager>();
-
-        services.AddDbContext<DirectoryServiceDbContext>((serviceProvider, options) =>
+        public IServiceCollection AddInfrastructure(IConfiguration configuration)
         {
-            options.UseNpgsql(configuration["DirectoryServiceDb"]);
+            services.AddScoped<ITransactionManager, TransactionManager>();
 
-            var loggerFactory = serviceProvider.GetRequiredService<ILoggerFactory>();
-            options.UseLoggerFactory(loggerFactory);
-            options.EnableSensitiveDataLogging();
-            options.EnableDetailedErrors();
-        });
+            services.AddDbContext<DirectoryServiceDbContext>((serviceProvider, options) =>
+            {
+                options.UseNpgsql(configuration["DirectoryServiceDb"]);
 
-        services.AddSingleton<IDbConnectionFactory, NpgSqlConnectionFactory>();
+                var loggerFactory = serviceProvider.GetRequiredService<ILoggerFactory>();
+                options.UseLoggerFactory(loggerFactory);
+                options.EnableSensitiveDataLogging();
+                options.EnableDetailedErrors();
+            });
 
-        services.AddScoped<ILocationsRepository, LocationsRepository>();
-        services.AddScoped<IDepartmentsRepository, DepartmentsRepository>();
-        services.AddScoped<IPositionsRepository, PositionsRepository>();
+            services.AddSingleton<IDbConnectionFactory, NpgSqlConnectionFactory>();
 
-        return services;
+            services.AddScoped<ILocationsRepository, LocationsRepository>();
+            services.AddScoped<IDepartmentsRepository, DepartmentsRepository>();
+            services.AddScoped<IPositionsRepository, PositionsRepository>();
+
+            return services;
+        }
     }
 }
