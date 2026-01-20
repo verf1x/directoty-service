@@ -14,7 +14,7 @@ builder.Host.UseSerilog((context, services, loggerConfig) =>
     string seqUrl = context.Configuration.GetConnectionString("Seq")
                     ?? throw new InvalidOperationException("Seq connection string is not configured");
 
-    LoggerConfigurationFactory.Configure(loggerConfig, seqUrl);
+    loggerConfig.Configure(seqUrl);
 });
 
 builder.Services.AddControllers();
