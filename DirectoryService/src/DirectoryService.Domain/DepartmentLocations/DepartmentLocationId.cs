@@ -9,7 +9,7 @@ public sealed class DepartmentLocationId : EntityIdBase
     {
     }
 
-    public static DepartmentLocationId CreateNew() => new(Guid.NewGuid());
+    public static DepartmentLocationId CreateNew() => new(Guid.CreateVersion7());
 
     public static DepartmentLocationId CreateEmpty() => new(Guid.Empty);
 
