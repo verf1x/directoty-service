@@ -10,9 +10,11 @@ public sealed class LocationConfiguration : IEntityTypeConfiguration<Location>
     {
         builder.ToTable("locations");
 
-        builder.HasKey(l => l.Id).HasName("pk_locations");
+        builder.HasKey(l => l.Id)
+            .HasName("pk_locations");
 
         builder.Property(l => l.Id)
+            .HasColumnName("id")
             .HasConversion(
                 id => id.Value,
                 value => LocationId.Create(value));

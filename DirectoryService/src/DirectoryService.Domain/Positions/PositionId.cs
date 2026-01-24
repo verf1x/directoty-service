@@ -9,7 +9,7 @@ public sealed class PositionId : EntityIdBase
     {
     }
 
-    public static PositionId CreateNew() => new(Guid.NewGuid());
+    public static PositionId CreateNew() => new(Guid.CreateVersion7());
 
     public static PositionId CreateEmpty() => new(Guid.Empty);
 
