@@ -10,9 +10,11 @@ public sealed class PositionConfiguration : IEntityTypeConfiguration<Position>
     {
         builder.ToTable("positions");
 
-        builder.HasKey(p => p.Id).HasName("pk_positions");
+        builder.HasKey(p => p.Id)
+            .HasName("pk_positions");
 
         builder.Property(p => p.Id)
+            .HasColumnName("id")
             .HasConversion(
                 id => id.Value,
                 value => PositionId.Create(value));

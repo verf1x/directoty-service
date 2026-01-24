@@ -12,7 +12,8 @@ public sealed class DepartmentPositionConfiguration : IEntityTypeConfiguration<D
     {
         builder.ToTable("department_positions");
 
-        builder.HasKey(dp => dp.Id).HasName("pk_department_positions");
+        builder.HasKey(dp => dp.Id)
+            .HasName("pk_department_positions");
 
         builder.Property(dp => dp.Id)
             .HasConversion(

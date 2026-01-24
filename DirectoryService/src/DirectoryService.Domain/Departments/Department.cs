@@ -79,7 +79,7 @@ public sealed class Department
         short depth,
         IEnumerable<DepartmentLocation> departmentLocations)
     {
-        if (depth <= 1)
+        if (depth < 1)
             return Errors.General.ValueIsInvalid(nameof(depth));
 
         return new Department(
@@ -100,5 +100,21 @@ public sealed class Department
         UpdatedAt = DateTime.UtcNow;
 
         return UnitResult.Success<Error>();
+    }
+
+    public void SetParent(DepartmentId newParentId, short parentDepth, Path parentPath)
+    {
+        ParentId = newParentId;
+        Depth = (short)(parentDepth + 1);
+        Path = Path.Create($"{parentPath.Value}.{Identifier.Value}").Value;
+        UpdatedAt = DateTime.UtcNow;
+    }
+
+    public void RemoveParent()
+    {
+        ParentId = null;
+        Depth = 0;
+        Path = Path.Create(Identifier.Value).Value;
+        UpdatedAt = DateTime.UtcNow;
     }
 }
