@@ -2,6 +2,7 @@
   <Folder Name="/Solution Items/">
     <File Path=".editorconfig" />
     <File Path="Directory.Build.props" />
+    <File Path="Directory.Packages.props" />
   </Folder>
   <Folder Name="/src/">
     <Project Path="src/DirectoryService.Application/DirectoryService.Application.csproj" />
@@ -9,5 +10,8 @@
     <Project Path="src/DirectoryService.Domain/DirectoryService.Domain.csproj" />
     <Project Path="src/DirectoryService.Infrastructure.Postgres/DirectoryService.Infrastructure.Postgres.csproj" />
     <Project Path="src/DirectoryService.Presentation/DirectoryService.Presentation.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="src/DirectoryService.IntegrationTests/DirectoryService.IntegrationTests.csproj" />
   </Folder>
 </Solution>
