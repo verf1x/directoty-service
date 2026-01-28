@@ -18,7 +18,7 @@ public class CreateDepartmentCommandFaker
         => new Faker<CreateDepartmentCommand>()
             .CustomInstantiator(f => new CreateDepartmentCommand(
                 $"Department_{f.Random.AlphaNumeric(10)}",
-                f.Internet.UserName().ToLower(),
+                f.Internet.DomainWord().ToLower(),
                 parentId,
                 locationIds));
 }

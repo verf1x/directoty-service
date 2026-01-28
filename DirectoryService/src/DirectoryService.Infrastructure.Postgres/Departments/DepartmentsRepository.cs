@@ -107,7 +107,7 @@ public class DepartmentsRepository : IDepartmentsRepository
         Guid parentId,
         CancellationToken cancellationToken)
     {
-        using var connection = await _dbConnectionFactory.CreateConnectionAsync(cancellationToken);
+        var connection = _dbContext.Database.GetDbConnection();
 
         const string query = """
                              SELECT id, path, depth FROM departments
@@ -128,7 +128,7 @@ public class DepartmentsRepository : IDepartmentsRepository
         string identifier,
         CancellationToken cancellationToken)
     {
-        using var connection = await _dbConnectionFactory.CreateConnectionAsync(cancellationToken);
+        var connection = _dbContext.Database.GetDbConnection();
 
         const string query = """
                              SELECT EXISTS(
@@ -145,7 +145,7 @@ public class DepartmentsRepository : IDepartmentsRepository
         Guid id,
         CancellationToken cancellationToken)
     {
-        using var connection = await _dbConnectionFactory.CreateConnectionAsync(cancellationToken);
+        var connection = _dbContext.Database.GetDbConnection();
 
         const string query = """
                              SELECT EXISTS(
@@ -155,7 +155,9 @@ public class DepartmentsRepository : IDepartmentsRepository
                              )
                              """;
 
-        return await connection.ExecuteScalarAsync<bool>(query, new { Id = id });
+        bool departmentActive = await connection.ExecuteScalarAsync<bool>(query, new { Id = id });
+
+        return departmentActive;
     }
 
     public async Task DeleteLocationsByDepartmentIdAsync(
@@ -195,7 +197,7 @@ public class DepartmentsRepository : IDepartmentsRepository
     {
         var locationIdsList = locationIds.Select(id => id.Value).ToList();
 
-        using var connection = await _dbConnectionFactory.CreateConnectionAsync(cancellationToken);
+        var connection = _dbContext.Database.GetDbConnection();
 
         const string sql = """
                            SELECT COUNT(*)
@@ -232,7 +234,10 @@ public class DepartmentsRepository : IDepartmentsRepository
         return hasDescendant;
     }
 
-    public async Task<UnitResult<ErrorList>> UpdateDepartmentsHierarchyAsync(Department department, short oldDepth, Path oldPath)
+    public async Task<UnitResult<ErrorList>> UpdateDepartmentsHierarchyAsync(
+        Department department,
+        short oldDepth,
+        Path oldPath)
     {
         var dbConnection = _dbContext.Database.GetDbConnection();
 

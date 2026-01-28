@@ -1,28 +1,18 @@
-﻿using DirectoryService.Application.Departments.Create;
+﻿using CSharpFunctionalExtensions;
+using DirectoryService.Application.Departments.Create;
 using DirectoryService.Domain.Departments;
-using DirectoryService.Domain.Locations;
-using DirectoryService.Infrastructure.Postgres;
+using DirectoryService.Domain.Shared;
 using DirectoryService.IntegrationTests.Fakers;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
 
-namespace DirectoryService.IntegrationTests;
+namespace DirectoryService.IntegrationTests.Departments;
 
-public class CreateDepartmentTests : IClassFixture<DirectoryServiceTestsWebFactory>, IAsyncLifetime
+public class CreateDepartmentTests : BaseIntegrationTest
 {
-    private readonly Func<Task> _resetDatabaseAsync;
-
     public CreateDepartmentTests(DirectoryServiceTestsWebFactory webFactory)
+        : base(webFactory)
     {
-        Services = webFactory.Services;
-        _resetDatabaseAsync = webFactory.ResetDatabaseAsync;
     }
-
-    private IServiceProvider Services { get; set; }
-
-    public Task InitializeAsync() => Task.CompletedTask;
-
-    public async Task DisposeAsync() => await _resetDatabaseAsync();
 
     [Fact]
     public async Task CreateDepartment_WithValidData_ShouldBeSucceed()
@@ -33,7 +23,7 @@ public class CreateDepartmentTests : IClassFixture<DirectoryServiceTestsWebFacto
         var cancellationToken = CancellationToken.None;
 
         // act
-        var result = await ExecuteHandler(sut =>
+        var result = await ExecuteHandler<CreateDepartmentHandler, Result<Guid, ErrorList>>(sut =>
         {
             var command = CreateDepartmentCommandFaker
                 .CreateRoot([locationId.Value])
@@ -66,7 +56,7 @@ public class CreateDepartmentTests : IClassFixture<DirectoryServiceTestsWebFacto
         var cancellationToken = CancellationToken.None;
 
         // act
-        var result = await ExecuteHandler(sut =>
+        var result = await ExecuteHandler<CreateDepartmentHandler, Result<Guid, ErrorList>>(sut =>
         {
             var command = CreateDepartmentCommandFaker
                 .CreateRoot([locationId1.Value, locationId2.Value])
@@ -96,7 +86,7 @@ public class CreateDepartmentTests : IClassFixture<DirectoryServiceTestsWebFacto
         var cancellationToken = CancellationToken.None;
 
         // act
-        var result = await ExecuteHandler(sut =>
+        var result = await ExecuteHandler<CreateDepartmentHandler, Result<Guid, ErrorList>>(sut =>
         {
             var command = CreateDepartmentCommandFaker
                 .CreateRoot([])
@@ -125,7 +115,7 @@ public class CreateDepartmentTests : IClassFixture<DirectoryServiceTestsWebFacto
         var cancellationToken = CancellationToken.None;
 
         // act
-        var result = await ExecuteHandler(sut =>
+        var result = await ExecuteHandler<CreateDepartmentHandler, Result<Guid, ErrorList>>(sut =>
         {
             var nonExistentLocationId = Guid.CreateVersion7();
 
@@ -147,45 +137,5 @@ public class CreateDepartmentTests : IClassFixture<DirectoryServiceTestsWebFacto
             Assert.True(result.IsFailure);
             Assert.NotEmpty(result.Error);
         });
-    }
-
-    private async Task<LocationId> CreateLocation()
-    {
-        return await ExecuteInDb(async dbContext =>
-        {
-            var location = LocationFaker
-                .Default
-                .Generate();
-
-            dbContext.Locations.Add(location);
-            await dbContext.SaveChangesAsync();
-
-            return location.Id;
-        });
-    }
-
-    private async Task<T> ExecuteHandler<T>(Func<CreateDepartmentHandler, Task<T>> func)
-    {
-        await using var scope = Services.CreateAsyncScope();
-        var sut = scope.ServiceProvider.GetRequiredService<CreateDepartmentHandler>();
-        return await func(sut);
-    }
-
-    private async Task<T> ExecuteInDb<T>(Func<DirectoryServiceDbContext, Task<T>> func)
-    {
-        await using var scope = Services.CreateAsyncScope();
-
-        var dbContext = scope.ServiceProvider.GetRequiredService<DirectoryServiceDbContext>();
-
-        return await func(dbContext);
-    }
-
-    private async Task ExecuteInDb(Func<DirectoryServiceDbContext, Task> func)
-    {
-        await using var scope = Services.CreateAsyncScope();
-
-        var dbContext = scope.ServiceProvider.GetRequiredService<DirectoryServiceDbContext>();
-
-        await func(dbContext);
     }
 }
