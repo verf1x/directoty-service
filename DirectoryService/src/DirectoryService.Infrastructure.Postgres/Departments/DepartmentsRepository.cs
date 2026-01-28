@@ -5,7 +5,6 @@ using DirectoryService.Contracts.Departments;
 using DirectoryService.Domain.Departments;
 using DirectoryService.Domain.Locations;
 using DirectoryService.Domain.Shared;
-using DirectoryService.Infrastructure.Postgres.Database;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Path = DirectoryService.Domain.Departments.Path;
@@ -15,16 +14,13 @@ namespace DirectoryService.Infrastructure.Postgres.Departments;
 public class DepartmentsRepository : IDepartmentsRepository
 {
     private readonly DirectoryServiceDbContext _dbContext;
-    private readonly IDbConnectionFactory _dbConnectionFactory;
     private readonly ILogger<DepartmentsRepository> _logger;
 
     public DepartmentsRepository(
         DirectoryServiceDbContext dbContext,
-        IDbConnectionFactory dbConnectionFactory,
         ILogger<DepartmentsRepository> logger)
     {
         _dbContext = dbContext;
-        _dbConnectionFactory = dbConnectionFactory;
         _logger = logger;
     }
 
@@ -263,7 +259,7 @@ public class DepartmentsRepository : IDepartmentsRepository
                     DepthDifference = (short)(oldDepth - department.Depth),
                 });
         }
-        catch (Exception ex)
+        catch (Exception)
         {
             return Error.Failure(
                     "update.departments.hierarchy.failed",
