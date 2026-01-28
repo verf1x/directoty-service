@@ -1,5 +1,6 @@
 ﻿using System.Data.Common;
 using DirectoryService.Infrastructure.Postgres;
+using DirectoryService.Infrastructure.Postgres.Database;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.TestHost;
@@ -57,6 +58,8 @@ public class DirectoryServiceTestsWebFactory : WebApplicationFactory<Program>, I
 
     protected override void ConfigureWebHost(IWebHostBuilder builder)
     {
+        builder.UseSetting("DirectoryServiceDb", _dbContainer.GetConnectionString());
+
         builder.ConfigureTestServices(sc =>
         {
             sc.RemoveAll<DirectoryServiceDbContext>();
