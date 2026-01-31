@@ -1,10 +1,8 @@
 ﻿using DirectoryService.Application.Abstractions;
 using DirectoryService.Application.Locations.Create;
 using DirectoryService.Application.Locations.Get;
-using DirectoryService.Contracts;
 using DirectoryService.Contracts.Locations;
 using DirectoryService.Contracts.Requests;
-using DirectoryService.Domain.Locations;
 using DirectoryService.Domain.Shared;
 using DirectoryService.Presentation.Response;
 using Microsoft.AspNetCore.Mvc;
@@ -40,12 +38,26 @@ public sealed class LocationsController : ControllerBase
 
     [HttpGet]
     [ProducesResponseType<Envelope<GetLocationsResponse>>(200)]
+    [ProducesResponseType<Envelope>(400)]
     public async Task<EndpointResult<GetLocationsResponse>> GetAsync(
         [FromQuery] GetLocationsRequest request,
         [FromServices] IQueryHandler<GetLocationsQuery, GetLocationsResponse> handler,
         CancellationToken cancellationToken)
     {
-        var query = new GetLocationsQuery();
+        var query = new GetLocationsQuery(
+            request.Pagination,
+            request.Search,
+            request.PostalCode,
+            request.Region,
+            request.City,
+            request.District,
+            request.Street,
+            request.House,
+            request.Building,
+            request.Apartment,
+            request.TimeZone,
+            request.SortBy,
+            request.SortDirection);
 
         return await handler.HandleAsync(query, cancellationToken);
     }

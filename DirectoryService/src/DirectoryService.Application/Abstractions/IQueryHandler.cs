@@ -6,13 +6,13 @@ namespace DirectoryService.Application.Abstractions;
 public interface IQueryHandler<in TQuery, TResponse>
     where TQuery : IQuery
 {
-    Task<Result<TResponse, Error>> HandleAsync(
+    Task<Result<TResponse, ErrorList>> HandleAsync(
         TQuery query,
         CancellationToken cancellationToken = default);
 }
 
 public interface IQueryHandler<TResponse>
 {
-    Task<Result<TResponse, Error>> HandleAsync(
+    Task<Result<TResponse, ErrorList>> HandleAsync(
         CancellationToken cancellationToken = default);
 }
