@@ -4,7 +4,8 @@ using DirectoryService.Infrastructure.Postgres;
 using DirectoryService.Presentation.Extensions;
 using DirectoryService.Presentation.Middlewares;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.OpenApi.Models;
+using Microsoft.OpenApi;
+using Scalar.AspNetCore;
 using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -34,12 +35,11 @@ builder.Services.AddOpenApi(options =>
     {
         if (context.JsonTypeInfo.Type == typeof(Envelope<ErrorList>))
         {
-            if (schema.Properties.TryGetValue("errors", out var errorsProperty))
+            if (schema.Properties is not null
+                && schema.Properties.TryGetValue("errors", out var errorsProperty)
+                && errorsProperty is OpenApiSchema errorsSchema)
             {
-                errorsProperty.Items.Reference = new OpenApiReference
-                {
-                    Type = ReferenceType.Schema, Id = nameof(Error),
-                };
+                errorsSchema.Items = new OpenApiSchemaReference(nameof(Error), null, null);
             }
         }
 
@@ -58,7 +58,12 @@ app.UseSerilogRequestLogging();
 if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
-    app.UseSwaggerUI(options => options.SwaggerEndpoint("/openapi/v1.json", "Directory Service API"));
+    app.MapScalarApiReference(options =>
+    {
+        options
+            .WithTitle("Directory Service API")
+            .WithOpenApiRoutePattern("/openapi/{documentName}.json");
+    });
 }
 
 app.MapControllers();
