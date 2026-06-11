@@ -1,7 +1,7 @@
 services:
   postgres:
     container_name: postgres-directory-service
-    image: postgres:18
+    image: postgres:18-alpine
     restart: always
     environment:
       POSTGRES_DB: directory_service

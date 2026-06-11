@@ -9,10 +9,14 @@ public static class DependencyInjection
     extension(IServiceCollection services)
     {
         public IServiceCollection AddApplication()
-            => services
+        {
+            Dapper.DefaultTypeMap.MatchNamesWithUnderscores = true;
+
+            return services
                 .AddCommands()
                 .AddQueries()
                 .AddValidatorsFromAssembly(typeof(DependencyInjection).Assembly);
+        }
 
         private IServiceCollection AddCommands()
             => services.Scan(scan => scan.FromAssemblies(typeof(DependencyInjection).Assembly)

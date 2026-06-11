@@ -1,8 +1,8 @@
 ﻿using DirectoryService.Application.Abstractions;
 using DirectoryService.Application.Locations.Create;
 using DirectoryService.Application.Locations.Get;
+using DirectoryService.Application.Locations.GetTop;
 using DirectoryService.Contracts.Locations;
-using DirectoryService.Contracts.Requests;
 using DirectoryService.Domain.Shared;
 using DirectoryService.Presentation.Response;
 using Microsoft.AspNetCore.Mvc;
@@ -58,6 +58,17 @@ public sealed class LocationsController : ControllerBase
             request.TimeZone,
             request.SortBy,
             request.SortDirection);
+
+        return await handler.HandleAsync(query, cancellationToken);
+    }
+
+    [HttpGet("top")]
+    [ProducesResponseType<Envelope<GetLocationsResponse>>(200)]
+    public async Task<EndpointResult<GetTopLocationsResponse>> GetTopAsync(
+        [FromServices] IQueryHandler<GetTopLocationsQuery, GetTopLocationsResponse> handler,
+        CancellationToken cancellationToken)
+    {
+        var query = new GetTopLocationsQuery();
 
         return await handler.HandleAsync(query, cancellationToken);
     }

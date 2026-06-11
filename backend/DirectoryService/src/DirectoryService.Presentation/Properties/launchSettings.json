@@ -11,6 +11,17 @@
         "ASPNETCORE_ENVIRONMENT": "Development"
       }
     },
+    "http-seeding": {
+      "commandName": "Project",
+      "dotnetRunMessages": true,
+      "launchBrowser": true,
+      "launchUrl": "http://localhost:5052/scalar",
+      "applicationUrl": "http://localhost:5052",
+      "commandLineArgs": "--seeding",
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      }
+    },
     "https": {
       "commandName": "Project",
       "dotnetRunMessages": true,
