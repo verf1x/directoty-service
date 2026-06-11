@@ -494,6 +494,8 @@ $RECYCLE.BIN/
 # Build results
 [Bb]in/
 [Oo]bj/
+[Bb]in\\Debug
+[Oo]bj\\Debug
 out/
 
 # .NET Core

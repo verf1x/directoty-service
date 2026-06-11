@@ -65,10 +65,11 @@ public sealed class LocationsController : ControllerBase
     [HttpGet("top")]
     [ProducesResponseType<Envelope<GetLocationsResponse>>(200)]
     public async Task<EndpointResult<GetTopLocationsResponse>> GetTopAsync(
-        [FromServices] IQueryHandler<GetTopLocationsQuery, GetTopLocationsResponse> handler)
+        [FromServices] IQueryHandler<GetTopLocationsQuery, GetTopLocationsResponse> handler,
+        CancellationToken cancellationToken)
     {
         var query = new GetTopLocationsQuery();
 
-        return await handler.HandleAsync(query, CancellationToken.None);
+        return await handler.HandleAsync(query, cancellationToken);
     }
 }
