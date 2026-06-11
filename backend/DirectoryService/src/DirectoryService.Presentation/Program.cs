@@ -1,6 +1,7 @@
-using DirectoryService.Application;
+﻿using DirectoryService.Application;
 using DirectoryService.Domain.Shared;
 using DirectoryService.Infrastructure.Postgres;
+using DirectoryService.Infrastructure.Postgres.Seeding;
 using DirectoryService.Presentation.Extensions;
 using DirectoryService.Presentation.Middlewares;
 using Microsoft.AspNetCore.Mvc;
@@ -64,6 +65,11 @@ if (app.Environment.IsDevelopment())
             .WithTitle("Directory Service API")
             .WithOpenApiRoutePattern("/openapi/{documentName}.json");
     });
+
+    if (args.Contains("--seeding"))
+    {
+        await app.Services.RunSeeding();
+    }
 }
 
 app.MapControllers();

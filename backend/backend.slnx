@@ -3,17 +3,14 @@
         <File Path="Directory.Build.props" />
         <File Path="Directory.Packages.props" />
     </Folder>
-    <Project
-        Path="DirectoryService/src/DirectoryService.Application/DirectoryService.Application.csproj" />
-    <Project
-        Path="DirectoryService/src/DirectoryService.Contracts/DirectoryService.Contracts.csproj" />
-    <Project Path="DirectoryService/src/DirectoryService.Domain/DirectoryService.Domain.csproj" />
-    <Project
-        Path="DirectoryService/src/DirectoryService.Infrastructure.Postgres/DirectoryService.Infrastructure.Postgres.csproj" />
-    <Project
-        Path="DirectoryService/src/DirectoryService.Presentation/DirectoryService.Presentation.csproj" />
+    <Folder Name="/src/">
+        <Project Path="DirectoryService/src/DirectoryService.Application/DirectoryService.Application.csproj" />
+        <Project Path="DirectoryService/src/DirectoryService.Contracts/DirectoryService.Contracts.csproj" />
+        <Project Path="DirectoryService/src/DirectoryService.Domain/DirectoryService.Domain.csproj" />
+        <Project Path="DirectoryService/src/DirectoryService.Infrastructure.Postgres/DirectoryService.Infrastructure.Postgres.csproj" />
+        <Project Path="DirectoryService/src/DirectoryService.Presentation/DirectoryService.Presentation.csproj" />
+    </Folder>
     <Folder Name="/tests/">
-        <Project
-            Path="DirectoryService/tests/DirectoryService.IntegrationTests/DirectoryService.IntegrationTests.csproj" />
+        <Project Path="DirectoryService/tests/DirectoryService.IntegrationTests/DirectoryService.IntegrationTests.csproj" />
     </Folder>
 </Solution>

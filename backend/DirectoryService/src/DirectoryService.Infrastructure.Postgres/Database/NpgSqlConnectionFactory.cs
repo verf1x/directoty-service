@@ -12,7 +12,11 @@ public class NpgSqlConnectionFactory : IDisposable, IAsyncDisposable, IDbConnect
 
     public NpgSqlConnectionFactory(IConfiguration configuration, ILoggerFactory loggerFactory)
     {
-        var dataSourceBuilder = new NpgsqlDataSourceBuilder(configuration["DirectoryServiceDb"]!);
+        string connectionString = configuration.GetConnectionString("DirectoryServiceDb")
+                                  ?? throw new InvalidOperationException(
+                                      "Connection string 'DirectoryServiceDb' is not configured.");
+
+        var dataSourceBuilder = new NpgsqlDataSourceBuilder(connectionString);
         dataSourceBuilder
             .UseLoggerFactory(loggerFactory);
 

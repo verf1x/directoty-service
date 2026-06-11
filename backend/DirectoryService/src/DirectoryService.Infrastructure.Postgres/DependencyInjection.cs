@@ -6,6 +6,7 @@ using DirectoryService.Infrastructure.Postgres.Database;
 using DirectoryService.Infrastructure.Postgres.Departments;
 using DirectoryService.Infrastructure.Postgres.Locations;
 using DirectoryService.Infrastructure.Postgres.Positions;
+using DirectoryService.Infrastructure.Postgres.Seeding;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -21,9 +22,13 @@ public static class DependencyInjection
         {
             services.AddScoped<ITransactionManager, TransactionManager>();
 
+            string connectionString = configuration.GetConnectionString("DirectoryServiceDb")
+                                      ?? throw new InvalidOperationException(
+                                          "Connection string 'DirectoryServiceDb' is not configured.");
+
             services.AddDbContext<DirectoryServiceDbContext>((serviceProvider, options) =>
             {
-                options.UseNpgsql(configuration["DirectoryServiceDb"]);
+                options.UseNpgsql(connectionString);
 
                 var loggerFactory = serviceProvider.GetRequiredService<ILoggerFactory>();
                 options.UseLoggerFactory(loggerFactory);
@@ -36,6 +41,7 @@ public static class DependencyInjection
             services.AddScoped<ILocationsRepository, LocationsRepository>();
             services.AddScoped<IDepartmentsRepository, DepartmentsRepository>();
             services.AddScoped<IPositionsRepository, PositionsRepository>();
+            services.AddScoped<DirectoryServiceSeeder>();
 
             return services;
         }

@@ -1,6 +1,6 @@
 ﻿using DirectoryService.Application.Abstractions;
 using DirectoryService.Application.Positions.Create;
-using DirectoryService.Contracts.Requests;
+using DirectoryService.Contracts.Positions;
 using DirectoryService.Domain.Shared;
 using DirectoryService.Presentation.Response;
 using Microsoft.AspNetCore.Mvc;

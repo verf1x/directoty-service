@@ -1,4 +1,4 @@
-﻿namespace DirectoryService.Contracts.Requests;
+﻿namespace DirectoryService.Contracts.Positions;
 
 public record CreatePositionRequest(
     string Name,
