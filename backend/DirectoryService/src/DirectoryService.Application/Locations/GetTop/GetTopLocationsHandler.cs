@@ -8,7 +8,7 @@ using DirectoryService.Domain.Shared;
 namespace DirectoryService.Application.Locations.GetTop;
 
 public class GetTopLocationsHandler(IDbConnectionFactory dbConnectionFactory)
-: IQueryHandler<GetTopLocationsQuery, GetTopLocationsResponse>
+    : IQueryHandler<GetTopLocationsQuery, GetTopLocationsResponse>
 {
     public async Task<Result<GetTopLocationsResponse, ErrorList>> HandleAsync(
         GetTopLocationsQuery query,

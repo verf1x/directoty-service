@@ -1,7 +1,9 @@
 ﻿using DirectoryService.Application.Abstractions;
 using DirectoryService.Application.Departments.Create;
+using DirectoryService.Application.Departments.Get;
 using DirectoryService.Application.Departments.UpdateLocations;
 using DirectoryService.Application.Departments.UpdateParent;
+using DirectoryService.Contracts;
 using DirectoryService.Contracts.Departments;
 using DirectoryService.Domain.Shared;
 using DirectoryService.Presentation.Response;
@@ -13,6 +15,23 @@ namespace DirectoryService.Presentation.Controllers;
 [Route("api/departments")]
 public sealed class DepartmentsController : ControllerBase
 {
+    [HttpGet]
+    [ProducesResponseType<Envelope<Guid>>(200)]
+    [ProducesResponseType<Envelope>(400)]
+    public async Task<EndpointResult<PagedResult<GetDepartmentsResponseItemDto>>> GetAsync(
+        [FromQuery] GetDepartmentsRequest request,
+        [FromServices] IQueryHandler<GetDepartmentsQuery, PagedResult<GetDepartmentsResponseItemDto>> handler,
+        CancellationToken cancellationToken)
+    {
+        var query = new GetDepartmentsQuery(
+            request.Search,
+            request.SortBy,
+            request.SortDirection,
+            request.Pagination);
+
+        return await handler.HandleAsync(query, cancellationToken);
+    }
+
     [HttpPost]
     [ProducesResponseType<Envelope<Guid>>(200)]
     [ProducesResponseType<Envelope>(400)]

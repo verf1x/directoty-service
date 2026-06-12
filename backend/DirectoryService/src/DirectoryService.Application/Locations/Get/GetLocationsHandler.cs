@@ -67,7 +67,7 @@ public class GetLocationsHandler : IQueryHandler<GetLocationsQuery, GetLocations
             splitOn: "totalCount",
             param: parameters);
 
-        return new GetLocationsResponse(locations.ToList(), totalCount ?? 0);
+        return new GetLocationsResponse([.. locations], totalCount ?? 0);
     }
 
     private string BuildSqlQuery(GetLocationsQuery query, DynamicParameters parameters)
