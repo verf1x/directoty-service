@@ -41,7 +41,7 @@ public record Error
     {
         string[] parts = serialized.Split(Separator);
 
-        return parts.Length < 2 || !Enum.TryParse(parts[2], out ErrorType type)
+        return parts.Length != 3 || !Enum.TryParse(parts[2], out ErrorType type)
             ? throw new ArgumentException("Invalid serialized format")
             : new Error(parts[0], parts[1], type);
     }

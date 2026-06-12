@@ -2,7 +2,7 @@
 
 namespace DirectoryService.Application.Database;
 
-public interface IDbConnectionFactory
+public interface IDbConnectionFactory : IAsyncDisposable, IDisposable
 {
     Task<IDbConnection> CreateConnectionAsync(CancellationToken cancellationToken);
 }
