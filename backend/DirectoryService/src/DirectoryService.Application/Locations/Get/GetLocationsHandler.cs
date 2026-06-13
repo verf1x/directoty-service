@@ -1,145 +1,120 @@
-﻿using System.Text;
+﻿using System.Data;
 using CSharpFunctionalExtensions;
 using Dapper;
 using DirectoryService.Application.Abstractions;
 using DirectoryService.Application.Database;
-using DirectoryService.Application.Extensions;
 using DirectoryService.Application.Validation;
+using DirectoryService.Contracts;
 using DirectoryService.Contracts.Locations;
 using DirectoryService.Domain.Shared;
 using FluentValidation;
 
 namespace DirectoryService.Application.Locations.Get;
 
-public class GetLocationsHandler : IQueryHandler<GetLocationsQuery, GetLocationsResponse>
+public class GetLocationsHandler(
+    IValidator<GetLocationsQuery> validator,
+    IDbConnectionFactory dbConnectionFactory) : IQueryHandler<GetLocationsQuery, PagedResult<LocationListItemDto>>
 {
-    private const string BaseSql = """
-                                   SELECT id,
-                                          name,
-                                          is_active AS isActive,
-                                          postal_code AS postalCode,
-                                          region,
-                                          city,
-                                          district,
-                                          street,
-                                          house,
-                                          building,
-                                          apartment,
-                                          time_zone AS timeZone,
-                                          created_at AS createdAt,
-                                          count(*) OVER () AS totalCount
-                                   FROM locations
-                                   """;
-
-    private readonly IValidator<GetLocationsQuery> _validator;
-    private readonly IDbConnectionFactory _dbConnectionFactory;
-
-    public GetLocationsHandler(
-        IValidator<GetLocationsQuery> validator,
-        IDbConnectionFactory dbConnectionFactory)
-    {
-        _validator = validator;
-        _dbConnectionFactory = dbConnectionFactory;
-    }
-
-    public async Task<Result<GetLocationsResponse, ErrorList>> HandleAsync(
+    public async Task<Result<PagedResult<LocationListItemDto>, ErrorList>> HandleAsync(
         GetLocationsQuery query,
         CancellationToken cancellationToken)
     {
-        var validationResult = await _validator.ValidateAsync(query, cancellationToken);
+        var validationResult = await validator.ValidateAsync(query, cancellationToken);
         if (!validationResult.IsValid)
             return validationResult.ToErrors();
 
         var parameters = new DynamicParameters();
-        string sql = BuildSqlQuery(query, parameters);
+        parameters.Add(
+            "search",
+            string.IsNullOrWhiteSpace(query.Search) ? null : $"%{query.Search}%",
+        DbType.String);
+        parameters.Add("min_departments_count", query.MinDepartmentsCount, DbType.Int32);
+        parameters.Add("limit", query.Pagination.PageSize, DbType.Int32);
+        parameters.Add("offset", (query.Pagination.Page - 1) * query.Pagination.PageSize, DbType.Int32);
 
-        using var dbConnection = await _dbConnectionFactory.CreateConnectionAsync(cancellationToken);
-
-        long? totalCount = null;
-
-        var locations = await dbConnection.QueryAsync<LocationDto, long, LocationDto>(
-            sql,
-            map: (location, count) =>
-            {
-                totalCount ??= count;
-                return location;
-            },
-            splitOn: "totalCount",
-            param: parameters);
-
-        return new GetLocationsResponse([.. locations], totalCount ?? 0);
-    }
-
-    private string BuildSqlQuery(GetLocationsQuery query, DynamicParameters parameters)
-    {
-        var sqlBuilder = new StringBuilder(BaseSql);
-
-        ApplyFilters(sqlBuilder, parameters, query);
-
-        sqlBuilder.ApplySorting(query.SortBy, query.SortDirection);
-        sqlBuilder.ApplyPagination(parameters, query.Pagination.PageNumber, query.Pagination.PageSize);
-
-        return sqlBuilder.ToString();
-    }
-
-    private void ApplyFilters(StringBuilder sqlBuilder, DynamicParameters parameters, GetLocationsQuery query)
-    {
-        var whereClauses = new List<string>();
-
-        if (!string.IsNullOrWhiteSpace(query.Search))
+        var sortBy = query.SortBy.ToLowerInvariant() switch
         {
-            whereClauses.Add("""
-                             (LOWER(name) ILIKE LOWER(@Search) OR 
-                              LOWER(region) ILIKE LOWER(@Search) OR 
-                              LOWER(city) ILIKE LOWER(@Search) OR 
-                              LOWER(district) ILIKE LOWER(@Search) OR 
-                              LOWER(street) ILIKE LOWER(@Search))
-                             """);
-            parameters.Add("Search", $"%{query.Search}%");
-        }
+            "name" => "name",
+            "createdat" => "created_at",
+            "departmentscount" => "departments_count",
+            _ => "name"
+        };
 
-        AddFilter(whereClauses, parameters, "postal_code = @PostalCode", "PostalCode", query.PostalCode);
-        AddILikeFilter(whereClauses, parameters, "region", "Region", query.Region);
-        AddILikeFilter(whereClauses, parameters, "city", "City", query.City);
-        AddILikeFilter(whereClauses, parameters, "district", "District", query.District);
-        AddILikeFilter(whereClauses, parameters, "street", "Street", query.Street);
-        AddILikeFilter(whereClauses, parameters, "house", "House", query.House);
-        AddILikeFilter(whereClauses, parameters, "building", "Building", query.Building);
-        AddILikeFilter(whereClauses, parameters, "apartment", "Apartment", query.Apartment);
-        AddILikeFilter(whereClauses, parameters, "time_zone", "TimeZone", query.TimeZone);
+        var sortDirection = string.Equals(query.SortDirection, "DESC", StringComparison.OrdinalIgnoreCase)
+            ? "DESC"
+            : "ASC";
 
-        if (whereClauses.Count > 0)
+        var orderByClause = $"ORDER BY {sortBy} {sortDirection}";
+
+
+        using var connection = await dbConnectionFactory.CreateConnectionAsync(cancellationToken);
+
+
+        var rows = (await connection.QueryAsync<LocationListRow>(
+            $"""
+            WITH locations_departments_count AS (SELECT l.id,
+                                            l.name,
+                                            l.postal_code,
+                                            l.region,
+                                            l.city,
+                                            l.district,
+                                            l.street,
+                                            l.house,
+                                            l.building,
+                                            l.apartment,
+                                            l.time_zone,
+                                            l.created_at,
+                                            COUNT(dl.department_id) AS departments_count
+                                     FROM locations l
+                                              LEFT JOIN department_locations dl ON l.id = dl.location_id
+                                     WHERE (@search IS NULL OR l.name ILIKE @search)
+                                     GROUP BY l.id)
+
+            SELECT 
+                id,
+                name,
+                postal_code,
+                region,
+                city,
+                district,
+                street,
+                house,
+                building,
+                apartment,
+                time_zone,
+                created_at,
+                departments_count,
+                COUNT(*) OVER () AS total_count
+            FROM locations_departments_count
+            WHERE (@min_departments_count IS NULL OR departments_count >= @min_departments_count)
+            {orderByClause}
+            LIMIT @limit OFFSET @offset
+            """,
+            param: parameters)).ToList();
+
+        var totalCount = rows.FirstOrDefault()?.TotalCount ?? 0;
+
+        var responseItems = rows.ConvertAll(row => new LocationListItemDto
         {
-            sqlBuilder.Append("\nWHERE ");
-            sqlBuilder.Append(string.Join("\nAND ", whereClauses));
-        }
-    }
+            Id = row.Id,
+            Name = row.Name,
+            PostalCode = row.PostalCode,
+            Region = row.Region,
+            City = row.City,
+            District = row.District,
+            Street = row.Street,
+            House = row.House,
+            Building = row.Building,
+            Apartment = row.Apartment,
+            TimeZone = row.TimeZone,
+            CreatedAt = row.CreatedAt,
+            DepartmentsCount = row.DepartmentsCount,
+        });
 
-    private void AddFilter(
-        List<string> clauses,
-        DynamicParameters parameters,
-        string sqlCondition,
-        string paramName,
-        string? value)
-    {
-        if (!string.IsNullOrWhiteSpace(value))
-        {
-            clauses.Add(sqlCondition);
-            parameters.Add(paramName, value);
-        }
-    }
-
-    private void AddILikeFilter(
-        List<string> clauses,
-        DynamicParameters parameters,
-        string columnName,
-        string paramName,
-        string? value)
-    {
-        if (!string.IsNullOrWhiteSpace(value))
-        {
-            clauses.Add($"{columnName} ILIKE @{paramName}");
-            parameters.Add(paramName, $"%{value}%");
-        }
+        return new PagedResult<LocationListItemDto>(
+            responseItems,
+            query.Pagination.Page,
+            query.Pagination.PageSize,
+            totalCount);
     }
 }
