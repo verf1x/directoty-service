@@ -2,6 +2,7 @@
 using DirectoryService.Application.Locations.Create;
 using DirectoryService.Application.Locations.Get;
 using DirectoryService.Application.Locations.GetTop;
+using DirectoryService.Contracts;
 using DirectoryService.Contracts.Locations;
 using DirectoryService.Domain.Shared;
 using DirectoryService.Presentation.Response;
@@ -37,25 +38,17 @@ public sealed class LocationsController : ControllerBase
     }
 
     [HttpGet]
-    [ProducesResponseType<Envelope<GetLocationsResponse>>(200)]
+    [ProducesResponseType<Envelope<PagedResult<LocationListItemDto>>>(200)]
     [ProducesResponseType<Envelope>(400)]
-    public async Task<EndpointResult<GetLocationsResponse>> GetAsync(
+    public async Task<EndpointResult<PagedResult<LocationListItemDto>>> GetAsync(
         [FromQuery] GetLocationsRequest request,
-        [FromServices] IQueryHandler<GetLocationsQuery, GetLocationsResponse> handler,
+        [FromServices] IQueryHandler<GetLocationsQuery, PagedResult<LocationListItemDto>> handler,
         CancellationToken cancellationToken)
     {
         var query = new GetLocationsQuery(
             request.Pagination,
+            request.MinDepartmentsCount,
             request.Search,
-            request.PostalCode,
-            request.Region,
-            request.City,
-            request.District,
-            request.Street,
-            request.House,
-            request.Building,
-            request.Apartment,
-            request.TimeZone,
             request.SortBy,
             request.SortDirection);
 

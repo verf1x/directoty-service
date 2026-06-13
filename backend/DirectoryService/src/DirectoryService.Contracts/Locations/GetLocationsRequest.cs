@@ -1,16 +1,8 @@
 ﻿namespace DirectoryService.Contracts.Locations;
 
 public record GetLocationsRequest(
-    PaginationRequest Pagination,
+    Pagination Pagination,
+    int? MinDepartmentsCount,
     string? Search,
-    string? PostalCode,
-    string? Region,
-    string? City,
-    string? District,
-    string? Street,
-    string? House,
-    string? Building,
-    string? Apartment,
-    string? TimeZone,
-    string SortBy = "name, created_at",
+    string SortBy = "name",
     string SortDirection = "asc");
