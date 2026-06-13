@@ -38,7 +38,7 @@ public sealed class LocationsController : ControllerBase
     }
 
     [HttpGet]
-    [ProducesResponseType<Envelope<GetLocationsResponse>>(200)]
+    [ProducesResponseType<Envelope<PagedResult<LocationListItemDto>>>(200)]
     [ProducesResponseType<Envelope>(400)]
     public async Task<EndpointResult<PagedResult<LocationListItemDto>>> GetAsync(
         [FromQuery] GetLocationsRequest request,

@@ -20,6 +20,7 @@ public class GetLocationsQueryValidator : AbstractValidator<GetLocationsQuery>
 
         RuleFor(x => x.Search)
             .NotEmpty()
+            .When(x => x.Search is not null)
             .WithError(Errors.Validation.CannotBeEmpty(nameof(GetLocationsQuery.Search)));
 
         RuleFor(x => x.MinDepartmentsCount)
