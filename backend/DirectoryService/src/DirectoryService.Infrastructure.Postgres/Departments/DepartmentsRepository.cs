@@ -156,6 +156,28 @@ public class DepartmentsRepository : IDepartmentsRepository
         return departmentActive;
     }
 
+    public async Task<bool> DepartmentsActiveByIdsAsync(
+        IEnumerable<Guid> ids,
+        CancellationToken cancellationToken)
+    {
+        var departmentIds = ids.ToList();
+
+        var connection = _dbContext.Database.GetDbConnection();
+
+        const string query = """
+                             SELECT COUNT(*)
+                             FROM departments
+                             WHERE id = ANY(@DepartmentIds)
+                             AND is_active = true
+                             """;
+
+        int activeCount = await connection.ExecuteScalarAsync<int>(
+            query,
+            new { DepartmentIds = departmentIds });
+
+        return activeCount == departmentIds.Count;
+    }
+
     public async Task DeleteLocationsByDepartmentIdAsync(
         DepartmentId departmentId,
         CancellationToken cancellationToken)

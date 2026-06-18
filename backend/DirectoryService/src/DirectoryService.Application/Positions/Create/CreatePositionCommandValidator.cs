@@ -14,7 +14,7 @@ public class CreatePositionCommandValidator : AbstractValidator<CreatePositionCo
 
         RuleFor(cp => cp.Description)
             .MustBeValueObject(Description.Create!)
-            .When(cp => !string.IsNullOrWhiteSpace(cp.Description));
+            .When(cp => cp.Description is not null);
 
         RuleFor(cp => cp.DepartmentIds)
             .Must(ids => ids.Length > 0)

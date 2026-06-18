@@ -55,8 +55,8 @@ public sealed class LocationsRepository : ILocationsRepository
 
         const string query = """
                              SELECT EXISTS(
-                                 SELECT 1 FROM Locations
-                                 WHERE Name = @Name
+                                 SELECT 1 FROM locations
+                                 WHERE name = @Name
                              )
                              """;
 
@@ -71,15 +71,15 @@ public sealed class LocationsRepository : ILocationsRepository
 
         const string query = """
                              SELECT EXISTS(
-                                 SELECT 1 FROM Locations
-                                 WHERE "postal_code" = @PostalCode
-                                 AND Region = @Region
-                                 AND City = @City
-                                 AND District = @District
-                                 AND Street = @Street
-                                 AND House = @House
-                                 AND Building = @Building
-                                 AND Apartment = @Apartment
+                                 SELECT 1 FROM locations
+                                 WHERE postal_code = @PostalCode
+                                 AND region = @Region
+                                 AND city = @City
+                                 AND district IS NOT DISTINCT FROM @District
+                                 AND street = @Street
+                                 AND house = @House
+                                 AND building IS NOT DISTINCT FROM @Building
+                                 AND apartment IS NOT DISTINCT FROM @Apartment
                              )
                              """;
 
@@ -106,8 +106,8 @@ public sealed class LocationsRepository : ILocationsRepository
 
         const string query = """
                              SELECT EXISTS(
-                                 SELECT 1 FROM Locations
-                                 WHERE "Id" = @Id
+                                 SELECT 1 FROM locations
+                                 WHERE id = @Id
                              )
                              """;
 

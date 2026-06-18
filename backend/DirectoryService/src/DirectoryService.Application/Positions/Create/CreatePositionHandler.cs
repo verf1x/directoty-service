@@ -46,10 +46,8 @@ public class CreatePositionHandler : ICommandHandler<CreatePositionCommand, Guid
 
         var name = PositionName.Create(command.Name).Value;
 
-        bool departmentIdsValid = (await Task.WhenAll(
-                command.DepartmentIds.Select(d =>
-                    _departmentsRepository.DepartmentActiveByIdAsync(d, cancellationToken))))
-            .All(exists => exists);
+        bool departmentIdsValid = await _departmentsRepository
+            .DepartmentsActiveByIdsAsync(command.DepartmentIds, cancellationToken);
 
         if (!departmentIdsValid)
             return Errors.General.ValueIsInvalid(nameof(command.DepartmentIds)).ToErrors();

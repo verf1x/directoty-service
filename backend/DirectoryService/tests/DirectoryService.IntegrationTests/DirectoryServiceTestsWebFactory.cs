@@ -1,4 +1,5 @@
 ﻿using System.Data.Common;
+using DirectoryService.Application.Database;
 using DirectoryService.Infrastructure.Postgres;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
@@ -16,7 +17,7 @@ namespace DirectoryService.IntegrationTests;
 public class DirectoryServiceTestsWebFactory : WebApplicationFactory<Program>, IAsyncLifetime
 {
     private readonly PostgreSqlContainer _dbContainer = new PostgreSqlBuilder()
-        .WithImage("postgres:18")
+        .WithImage("postgres:18-alpine")
         .WithDatabase("directory_service_tests_db")
         .WithUsername("postgres")
         .WithPassword("postgres")
@@ -62,6 +63,7 @@ public class DirectoryServiceTestsWebFactory : WebApplicationFactory<Program>, I
         builder.ConfigureTestServices(sc =>
         {
             sc.RemoveAll<DirectoryServiceDbContext>();
+            sc.RemoveAll<IDbConnectionFactory>();
 
             sc.AddDbContext<DirectoryServiceDbContext>((serviceProvider, options) =>
             {
@@ -72,6 +74,9 @@ public class DirectoryServiceTestsWebFactory : WebApplicationFactory<Program>, I
                 options.EnableSensitiveDataLogging();
                 options.EnableDetailedErrors();
             });
+
+            sc.AddSingleton<IDbConnectionFactory>(
+                _ => new TestDbConnectionFactory(_dbContainer.GetConnectionString()));
         });
     }
 
@@ -80,5 +85,22 @@ public class DirectoryServiceTestsWebFactory : WebApplicationFactory<Program>, I
         _respawner = await Respawner.CreateAsync(
             _dbConnection,
             new RespawnerOptions() { DbAdapter = DbAdapter.Postgres, SchemasToInclude = ["public"], });
+    }
+
+    private sealed class TestDbConnectionFactory(string connectionString) : IDbConnectionFactory
+    {
+        public async Task<System.Data.IDbConnection> CreateConnectionAsync(CancellationToken cancellationToken)
+        {
+            var connection = new NpgsqlConnection(connectionString);
+            await connection.OpenAsync(cancellationToken);
+
+            return connection;
+        }
+
+        public void Dispose()
+        {
+        }
+
+        public ValueTask DisposeAsync() => ValueTask.CompletedTask;
     }
 }
