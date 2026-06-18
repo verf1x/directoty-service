@@ -33,6 +33,10 @@ public interface IDepartmentsRepository
         Guid id,
         CancellationToken cancellationToken);
 
+    Task<bool> DepartmentsActiveByIdsAsync(
+        IEnumerable<Guid> ids,
+        CancellationToken cancellationToken);
+
     Task DeleteLocationsByDepartmentIdAsync(
         DepartmentId departmentId,
         CancellationToken cancellationToken);
