@@ -1,9 +1,12 @@
-﻿using CSharpFunctionalExtensions;
+﻿using System.Linq.Expressions;
+using CSharpFunctionalExtensions;
 using Dapper;
 using DirectoryService.Application.Database;
 using DirectoryService.Application.Positions;
+using DirectoryService.Domain.Departments;
 using DirectoryService.Domain.Positions;
 using DirectoryService.Domain.Shared;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
 namespace DirectoryService.Infrastructure.Postgres.Positions;
@@ -62,5 +65,32 @@ public class PositionsRepository : IPositionsRepository
                              """;
 
         return await connection.ExecuteScalarAsync<bool>(query, new { PositionName = positionName });
+    }
+
+    public async Task<Result<Position, Error>> GetByAsync(
+        Expression<Func<Position, bool>> predicate,
+        CancellationToken cancellationToken)
+    {
+        var position = await _dbContext.Positions.FirstOrDefaultAsync(predicate, cancellationToken);
+
+        if (position is null)
+            return Errors.General.NotFound();
+
+        return position;
+    }
+
+    public async Task<IReadOnlyList<Position>> GetByDepartmentIdToDeactivateAsync(
+        DepartmentId departmentId,
+        CancellationToken cancellationToken)
+    {
+        var positionsToDeactivate = await _dbContext.Positions
+            .Where(p => p.IsActive)
+            .Where(p => p.DepartmentPositions.Any(dp => dp.DepartmentId == departmentId))
+            .Where(p => !p.DepartmentPositions.Any(dp =>
+                dp.DepartmentId != departmentId &&
+                dp.Department.IsActive))
+            .ToListAsync(cancellationToken);
+
+        return positionsToDeactivate;
     }
 }

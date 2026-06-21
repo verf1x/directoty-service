@@ -1,4 +1,4 @@
-using DirectoryService.Domain.DepartmentPositions;
+﻿using DirectoryService.Domain.DepartmentPositions;
 
 namespace DirectoryService.Domain.Positions;
 
@@ -37,5 +37,21 @@ public sealed class Position
 
     public DateTime? UpdatedAt { get; private set; }
 
+    public DateTime? DeletedAt { get; private set; }
+
     public IReadOnlyList<DepartmentPosition> DepartmentPositions => _departmentPositions.AsReadOnly();
+
+    public void SoftDelete()
+    {
+        IsActive = false;
+        DeletedAt = DateTime.UtcNow;
+        UpdatedAt = DateTime.UtcNow;
+    }
+
+    public void Restore()
+    {
+        IsActive = true;
+        DeletedAt = null;
+        UpdatedAt = DateTime.UtcNow;
+    }
 }

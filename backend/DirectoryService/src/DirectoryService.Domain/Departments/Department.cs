@@ -53,6 +53,8 @@ public sealed class Department
 
     public DateTime? UpdatedAt { get; private set; }
 
+    public DateTime? DeletedAt { get; private set; }
+
     public IReadOnlyList<DepartmentLocation> DepartmentLocations => _departmentLocations.AsReadOnly();
 
     public IReadOnlyList<DepartmentPosition> DepartmentPositions => _departmentPositions.AsReadOnly();
@@ -115,6 +117,22 @@ public sealed class Department
         ParentId = null;
         Depth = 0;
         Path = Path.Create(Identifier.Value).Value;
+        UpdatedAt = DateTime.UtcNow;
+    }
+
+    public void SoftDelete()
+    {
+        IsActive = false;
+        Identifier = Identifier.Create($"deleted-{Identifier}").Value;
+        DeletedAt = DateTime.UtcNow;
+        UpdatedAt = DateTime.UtcNow;
+    }
+
+    public void Restore()
+    {
+        IsActive = true;
+        Identifier = Identifier.Create(Identifier.Value.Replace("deleted-", string.Empty)).Value;
+        DeletedAt = null;
         UpdatedAt = DateTime.UtcNow;
     }
 }

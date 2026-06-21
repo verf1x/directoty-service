@@ -1,4 +1,4 @@
-namespace DirectoryService.Application.Locations.Get;
+﻿namespace DirectoryService.Contracts.Locations;
 
 public class LocationListRow
 {
@@ -25,6 +25,8 @@ public class LocationListRow
     public required string TimeZone { get; init; }
 
     public required DateTime CreatedAt { get; init; }
+
+    public required bool IsActive { get; init; }
 
     public required int DepartmentsCount { get; init; }
 

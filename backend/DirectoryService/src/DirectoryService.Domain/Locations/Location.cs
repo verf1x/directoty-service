@@ -1,4 +1,4 @@
-using DirectoryService.Domain.DepartmentLocations;
+﻿using DirectoryService.Domain.DepartmentLocations;
 
 namespace DirectoryService.Domain.Locations;
 
@@ -35,5 +35,21 @@ public sealed class Location
 
     public DateTime? UpdatedAt { get; private set; }
 
+    public DateTime? DeletedAt { get; private set; }
+
     public IReadOnlyList<DepartmentLocation> DepartmentLocations => _departmentLocations.AsReadOnly();
+
+    public void SoftDelete()
+    {
+        IsActive = false;
+        DeletedAt = DateTime.UtcNow;
+        UpdatedAt = DateTime.UtcNow;
+    }
+
+    public void Restore()
+    {
+        IsActive = true;
+        DeletedAt = null;
+        UpdatedAt = DateTime.UtcNow;
+    }
 }

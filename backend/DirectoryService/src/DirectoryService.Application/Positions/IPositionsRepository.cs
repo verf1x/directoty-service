@@ -1,4 +1,6 @@
-﻿using CSharpFunctionalExtensions;
+﻿using System.Linq.Expressions;
+using CSharpFunctionalExtensions;
+using DirectoryService.Domain.Departments;
 using DirectoryService.Domain.Positions;
 using DirectoryService.Domain.Shared;
 
@@ -10,4 +12,12 @@ public interface IPositionsRepository
 
     Task<bool> IsPositionWithNameAlreadyActive(
         string positionName, CancellationToken cancellationToken);
+
+    Task<Result<Position, Error>> GetByAsync(
+        Expression<Func<Position, bool>> predicate,
+        CancellationToken cancellationToken);
+
+    Task<IReadOnlyList<Position>> GetByDepartmentIdToDeactivateAsync(
+        DepartmentId departmentId,
+        CancellationToken cancellationToken);
 }

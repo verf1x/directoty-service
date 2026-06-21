@@ -1,4 +1,4 @@
-using DirectoryService.Domain.Positions;
+﻿using DirectoryService.Domain.Positions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -47,6 +47,11 @@ public sealed class PositionConfiguration : IEntityTypeConfiguration<Position>
 
         builder.Property(p => p.UpdatedAt)
             .HasColumnName("updated_at")
+            .HasColumnType("timestamp with time zone")
+            .IsRequired(false);
+
+        builder.Property(p => p.DeletedAt)
+            .HasColumnName("deleted_at")
             .HasColumnType("timestamp with time zone")
             .IsRequired(false);
     }

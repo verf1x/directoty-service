@@ -2,6 +2,7 @@
 using DirectoryService.Application.Locations.Create;
 using DirectoryService.Application.Locations.Get;
 using DirectoryService.Application.Locations.GetTop;
+using DirectoryService.Application.Locations.SoftDelete;
 using DirectoryService.Contracts;
 using DirectoryService.Contracts.Locations;
 using DirectoryService.Domain.Shared;
@@ -64,5 +65,18 @@ public sealed class LocationsController : ControllerBase
         var query = new GetTopLocationsQuery();
 
         return await handler.HandleAsync(query, cancellationToken);
+    }
+
+    [HttpDelete("{id}")]
+    [ProducesResponseType<Envelope<Guid>>(200)]
+    [ProducesResponseType<Envelope>(404)]
+    public async Task<EndpointResult<Guid>> DeleteLocationAsync(
+        [FromRoute] Guid id,
+        [FromServices] ICommandHandler<SoftDeleteLocationCommand, Guid> handler,
+        CancellationToken cancellationToken)
+    {
+        var command = new SoftDeleteLocationCommand(id);
+
+        return await handler.HandleAsync(command, cancellationToken);
     }
 }

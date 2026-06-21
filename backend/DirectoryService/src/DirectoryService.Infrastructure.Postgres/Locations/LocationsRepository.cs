@@ -1,9 +1,12 @@
-﻿using CSharpFunctionalExtensions;
+﻿using System.Linq.Expressions;
+using CSharpFunctionalExtensions;
 using Dapper;
 using DirectoryService.Application.Database;
 using DirectoryService.Application.Locations;
+using DirectoryService.Domain.Departments;
 using DirectoryService.Domain.Locations;
 using DirectoryService.Domain.Shared;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
 namespace DirectoryService.Infrastructure.Postgres.Locations;
@@ -112,5 +115,34 @@ public sealed class LocationsRepository : ILocationsRepository
                              """;
 
         return await connection.ExecuteScalarAsync<bool>(query, new { Id = locationId });
+    }
+
+    public async Task<Result<Location, Error>> GetByAsync(
+        Expression<Func<Location, bool>> predicate,
+        CancellationToken cancellationToken)
+    {
+        var location = await _dbContext.Locations.FirstOrDefaultAsync(predicate, cancellationToken);
+
+        if (location is null)
+        {
+            return Errors.General.NotFound();
+        }
+
+        return location;
+    }
+
+    public async Task<IReadOnlyList<Location>> GetByDepartmentIdToDeactivateAsync(
+        DepartmentId departmentId,
+        CancellationToken cancellationToken)
+    {
+        var locationsToDeactivate = await _dbContext.Locations
+            .Where(l => l.IsActive)
+            .Where(l => l.DepartmentLocations.Any(dl => dl.DepartmentId == departmentId))
+            .Where(l => !l.DepartmentLocations.Any(dl =>
+                dl.DepartmentId != departmentId &&
+                dl.Department.IsActive))
+            .ToListAsync(cancellationToken);
+
+        return locationsToDeactivate;
     }
 }

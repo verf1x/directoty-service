@@ -26,5 +26,7 @@ public record LocationListItemDto
 
     public required DateTime CreatedAt { get; init; }
 
+    public required bool IsActive { get; init; }
+
     public required int DepartmentsCount { get; init; }
 }

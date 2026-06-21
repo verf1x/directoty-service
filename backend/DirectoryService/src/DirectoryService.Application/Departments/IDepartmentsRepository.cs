@@ -1,4 +1,5 @@
-﻿using CSharpFunctionalExtensions;
+﻿using System.Linq.Expressions;
+using CSharpFunctionalExtensions;
 using DirectoryService.Contracts.Departments;
 using DirectoryService.Domain.Departments;
 using DirectoryService.Domain.Locations;
@@ -9,6 +10,10 @@ namespace DirectoryService.Application.Departments;
 
 public interface IDepartmentsRepository
 {
+    Task<Result<Department, Error>> GetByAsync(
+        Expression<Func<Department, bool>> predicate,
+        CancellationToken cancellationToken);
+
     Task<Result<Department, Error>> GetByIdWithLocationsAsync(
         DepartmentId departmentId,
         CancellationToken cancellationToken);

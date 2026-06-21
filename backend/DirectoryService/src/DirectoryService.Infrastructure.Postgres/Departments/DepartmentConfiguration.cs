@@ -1,4 +1,4 @@
-using DirectoryService.Domain.Departments;
+﻿using DirectoryService.Domain.Departments;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Path = DirectoryService.Domain.Departments.Path;
@@ -71,6 +71,11 @@ public sealed class DepartmentConfiguration : IEntityTypeConfiguration<Departmen
 
         builder.Property(d => d.UpdatedAt)
             .HasColumnName("updated_at")
+            .HasColumnType("timestamp with time zone")
+            .IsRequired(false);
+
+        builder.Property(d => d.DeletedAt)
+            .HasColumnName("deleted_at")
             .HasColumnType("timestamp with time zone")
             .IsRequired(false);
     }

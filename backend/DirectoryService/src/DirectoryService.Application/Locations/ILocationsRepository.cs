@@ -1,4 +1,6 @@
-﻿using CSharpFunctionalExtensions;
+﻿using System.Linq.Expressions;
+using CSharpFunctionalExtensions;
+using DirectoryService.Domain.Departments;
 using DirectoryService.Domain.Locations;
 using DirectoryService.Domain.Shared;
 
@@ -16,5 +18,13 @@ public interface ILocationsRepository
 
     Task<bool> LocationExistsByIdAsync(
         Guid locationId,
+        CancellationToken cancellationToken);
+
+    Task<Result<Location, Error>> GetByAsync(
+        Expression<Func<Location, bool>> predicate,
+        CancellationToken cancellationToken);
+
+    Task<IReadOnlyList<Location>> GetByDepartmentIdToDeactivateAsync(
+        DepartmentId departmentId,
         CancellationToken cancellationToken);
 }

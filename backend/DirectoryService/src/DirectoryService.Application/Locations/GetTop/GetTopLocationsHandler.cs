@@ -31,6 +31,8 @@ public class GetTopLocationsHandler(IDbConnectionFactory dbConnectionFactory)
                    COUNT(dl.department_id) AS departments_count
             FROM locations l
                      LEFT JOIN department_locations dl ON l.id = dl.location_id
+            WHERE l.is_active = TRUE
+              AND l.deleted_at IS NULL
             GROUP BY l.id
             ORDER BY departments_count DESC
             LIMIT 5

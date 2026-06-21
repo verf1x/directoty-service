@@ -66,6 +66,11 @@ public class DirectoryServiceSeeder
         "Asia/Novosibirsk",
     ];
 
+    private static int CalculateDepartmentCount()
+    {
+        return RootDepartmentCount * (1 + ChildDepartmentsPerRoot + (ChildDepartmentsPerRoot * TeamsPerChildDepartment));
+    }
+
     private readonly DirectoryServiceDbContext _dbContext;
     private readonly ILogger<DirectoryServiceSeeder> _logger;
 
@@ -83,10 +88,24 @@ public class DirectoryServiceSeeder
 
         await _dbContext.Database.MigrateAsync();
 
-        if (await DatabaseHasData())
+        var seedState = await GetSeedState();
+
+        if (seedState.IsComplete)
         {
-            _logger.LogInformation("Directory service database already contains data. Seeding skipped.");
+            _logger.LogInformation(
+                "Directory service database already contains complete seed data. Seeding skipped. Departments: {DepartmentsCount}, locations: {LocationsCount}, positions: {PositionsCount}, department-location links: {DepartmentLocationLinksCount}, department-position links: {DepartmentPositionLinksCount}.",
+                seedState.DepartmentsCount,
+                seedState.LocationsCount,
+                seedState.PositionsCount,
+                seedState.DepartmentLocationsCount,
+                seedState.DepartmentPositionsCount);
             return;
+        }
+
+        if (seedState.HasAnyData)
+        {
+            throw new InvalidOperationException(
+                "Directory service database contains partial data. Clear directory tables before running seeding.");
         }
 
         _logger.LogInformation("Directory service seeding started.");
@@ -123,11 +142,20 @@ public class DirectoryServiceSeeder
             departmentPositions.Count);
     }
 
-    private async Task<bool> DatabaseHasData()
+    private async Task<SeedState> GetSeedState()
     {
-        return await _dbContext.Departments.AnyAsync()
-               || await _dbContext.Locations.AnyAsync()
-               || await _dbContext.Positions.AnyAsync();
+        int departmentsCount = await _dbContext.Departments.CountAsync();
+        int locationsCount = await _dbContext.Locations.CountAsync();
+        int positionsCount = await _dbContext.Positions.CountAsync();
+        int departmentLocationsCount = await _dbContext.Set<DepartmentLocation>().CountAsync();
+        int departmentPositionsCount = await _dbContext.Set<DepartmentPosition>().CountAsync();
+
+        return new SeedState(
+            departmentsCount,
+            locationsCount,
+            positionsCount,
+            departmentLocationsCount,
+            departmentPositionsCount);
     }
 
     private List<Location> CreateLocations()
@@ -323,11 +351,6 @@ public class DirectoryServiceSeeder
         return result;
     }
 
-    private int CalculateDepartmentCount()
-    {
-        return RootDepartmentCount * (1 + ChildDepartmentsPerRoot + (ChildDepartmentsPerRoot * TeamsPerChildDepartment));
-    }
-
     private T CreateValue<T>(CSharpFunctionalExtensions.Result<T, Error> result, string name)
     {
         if (result.IsFailure)
@@ -358,5 +381,27 @@ public class DirectoryServiceSeeder
 
         if (PositionsPerDepartment <= 0)
             throw new InvalidOperationException($"{nameof(PositionsPerDepartment)} must be greater than zero.");
+    }
+
+    private sealed record SeedState(
+        int DepartmentsCount,
+        int LocationsCount,
+        int PositionsCount,
+        int DepartmentLocationsCount,
+        int DepartmentPositionsCount)
+    {
+        public bool HasAnyData =>
+            DepartmentsCount > 0
+            || LocationsCount > 0
+            || PositionsCount > 0
+            || DepartmentLocationsCount > 0
+            || DepartmentPositionsCount > 0;
+
+        public bool IsComplete =>
+            DepartmentsCount >= CalculateDepartmentCount()
+            && LocationsCount >= LocationCount
+            && PositionsCount >= PositionCount
+            && DepartmentLocationsCount >= CalculateDepartmentCount() * LocationsPerDepartment
+            && DepartmentPositionsCount >= CalculateDepartmentCount() * PositionsPerDepartment;
     }
 }

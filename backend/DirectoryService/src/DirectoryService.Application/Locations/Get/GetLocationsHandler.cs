@@ -27,7 +27,7 @@ public class GetLocationsHandler(
         parameters.Add(
             "search",
             string.IsNullOrWhiteSpace(query.Search) ? null : $"%{query.Search}%",
-        DbType.String);
+            DbType.String);
         parameters.Add("min_departments_count", query.MinDepartmentsCount, DbType.Int32);
         parameters.Add("limit", query.Pagination.PageSize, DbType.Int32);
         parameters.Add("offset", (query.Pagination.Page - 1) * query.Pagination.PageSize, DbType.Int32);
@@ -52,44 +52,46 @@ public class GetLocationsHandler(
 
         var rows = (await connection.QueryAsync<LocationListRow>(
             $"""
-            WITH locations_departments_count AS (SELECT l.id,
-                                            l.name,
-                                            l.postal_code,
-                                            l.region,
-                                            l.city,
-                                            l.district,
-                                            l.street,
-                                            l.house,
-                                            l.building,
-                                            l.apartment,
-                                            l.time_zone,
-                                            l.created_at,
-                                            COUNT(dl.department_id) AS departments_count
-                                     FROM locations l
-                                              LEFT JOIN department_locations dl ON l.id = dl.location_id
-                                     WHERE (@search IS NULL OR l.name ILIKE @search)
-                                     GROUP BY l.id)
+             WITH locations_departments_count AS (SELECT l.id,
+                                             l.name,
+                                             l.postal_code,
+                                             l.region,
+                                             l.city,
+                                             l.district,
+                                             l.street,
+                                             l.house,
+                                             l.building,
+                                             l.apartment,
+                                             l.time_zone,
+                                             l.created_at,
+                                             COUNT(dl.department_id) AS departments_count
+                                      FROM locations l
+                                               LEFT JOIN department_locations dl ON l.id = dl.location_id
+                                      WHERE (@search IS NULL OR l.name ILIKE @search)
+                                      AND l.deleted_at IS NULL
+                                      AND is_active = TRUE
+                                      GROUP BY l.id)
 
-            SELECT 
-                id,
-                name,
-                postal_code,
-                region,
-                city,
-                district,
-                street,
-                house,
-                building,
-                apartment,
-                time_zone,
-                created_at,
-                departments_count,
-                COUNT(*) OVER () AS total_count
-            FROM locations_departments_count
-            WHERE (@min_departments_count IS NULL OR departments_count >= @min_departments_count)
-            {orderByClause}
-            LIMIT @limit OFFSET @offset
-            """,
+             SELECT 
+                 id,
+                 name,
+                 postal_code,
+                 region,
+                 city,
+                 district,
+                 street,
+                 house,
+                 building,
+                 apartment,
+                 time_zone,
+                 created_at,
+                 departments_count,
+                 COUNT(*) OVER () AS total_count
+             FROM locations_departments_count
+             WHERE (@min_departments_count IS NULL OR departments_count >= @min_departments_count)
+             {orderByClause}
+             LIMIT @limit OFFSET @offset
+             """,
             param: parameters)).ToList();
 
         var totalCount = rows.FirstOrDefault()?.TotalCount ?? 0;
@@ -108,6 +110,7 @@ public class GetLocationsHandler(
             Apartment = row.Apartment,
             TimeZone = row.TimeZone,
             CreatedAt = row.CreatedAt,
+            IsActive = row.IsActive,
             DepartmentsCount = row.DepartmentsCount,
         });
 

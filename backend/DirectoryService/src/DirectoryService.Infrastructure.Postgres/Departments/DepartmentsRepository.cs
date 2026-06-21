@@ -1,4 +1,5 @@
-﻿using CSharpFunctionalExtensions;
+﻿using System.Linq.Expressions;
+using CSharpFunctionalExtensions;
 using Dapper;
 using DirectoryService.Application.Departments;
 using DirectoryService.Contracts.Departments;
@@ -22,6 +23,22 @@ public class DepartmentsRepository : IDepartmentsRepository
     {
         _dbContext = dbContext;
         _logger = logger;
+    }
+
+    public async Task<Result<Department, Error>> GetByAsync(
+        Expression<Func<Department, bool>> predicate,
+        CancellationToken cancellationToken)
+    {
+        var department = await _dbContext.Departments.FirstOrDefaultAsync(predicate, cancellationToken);
+
+        if (department is null)
+        {
+            return Error.NotFound(
+                "department.not.found",
+                "Department was not found.");
+        }
+
+        return department;
     }
 
     public async Task<Result<Department, Error>> GetByIdWithLocationsAsync(

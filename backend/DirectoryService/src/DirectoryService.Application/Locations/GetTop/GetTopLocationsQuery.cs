@@ -2,4 +2,4 @@
 
 namespace DirectoryService.Application.Locations.GetTop;
 
-public class GetTopLocationsQuery() : IQuery;
+public class GetTopLocationsQuery : IQuery;

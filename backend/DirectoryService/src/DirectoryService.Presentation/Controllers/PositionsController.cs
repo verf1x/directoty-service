@@ -1,5 +1,6 @@
 ﻿using DirectoryService.Application.Abstractions;
 using DirectoryService.Application.Positions.Create;
+using DirectoryService.Application.Positions.SoftDelete;
 using DirectoryService.Contracts.Positions;
 using DirectoryService.Domain.Shared;
 using DirectoryService.Presentation.Response;
@@ -24,6 +25,19 @@ public class PositionsController : ControllerBase
             request.Name,
             request.Description,
             request.DepartmentIds);
+
+        return await handler.HandleAsync(command, cancellationToken);
+    }
+
+    [HttpDelete("{id}")]
+    [ProducesResponseType<Envelope<Guid>>(200)]
+    [ProducesResponseType<Envelope>(404)]
+    public async Task<EndpointResult<Guid>> DeletePositionAsync(
+        [FromRoute] Guid id,
+        [FromServices] ICommandHandler<SoftDeletePositionCommand, Guid> handler,
+        CancellationToken cancellationToken)
+    {
+        var command = new SoftDeletePositionCommand(id);
 
         return await handler.HandleAsync(command, cancellationToken);
     }

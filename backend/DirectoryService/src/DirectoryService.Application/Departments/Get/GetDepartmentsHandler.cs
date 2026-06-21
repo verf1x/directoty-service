@@ -13,7 +13,8 @@ namespace DirectoryService.Application.Departments.Get;
 
 public class GetDepartmentsHandler(
     IValidator<GetDepartmentsQuery> validator,
-    IDbConnectionFactory dbConnectionFactory) : IQueryHandler<GetDepartmentsQuery, PagedResult<GetDepartmentsResponseItemDto>>
+    IDbConnectionFactory dbConnectionFactory)
+    : IQueryHandler<GetDepartmentsQuery, PagedResult<GetDepartmentsResponseItemDto>>
 {
     public async Task<Result<PagedResult<GetDepartmentsResponseItemDto>, ErrorList>> HandleAsync(
         GetDepartmentsQuery query,
@@ -30,7 +31,7 @@ public class GetDepartmentsHandler(
         parameters.Add(
             "search",
             string.IsNullOrWhiteSpace(query.Search) ? null : $"%{query.Search}%",
-        DbType.String);
+            DbType.String);
         parameters.Add("limit", query.Pagination.PageSize, DbType.Int32);
         parameters.Add("offset", (query.Pagination.Page - 1) * query.Pagination.PageSize, DbType.Int32);
 
@@ -51,27 +52,26 @@ public class GetDepartmentsHandler(
 
         var departments = await dbConnection.QueryAsync<GetDepartmentsRow>(
             $"""
-            SELECT
-                d.id,
-                d.name,
-                d.path,
-                d.created_at,
-                COUNT(*) OVER() AS total_count
-            FROM departments d
-            WHERE (@search IS NULL OR d.name ILIKE @search)
-            {orderByClause}
-            LIMIT @limit OFFSET @offset;
-            """,
+             SELECT
+                 d.id,
+                 d.name,
+                 d.path,
+                 d.created_at,
+                 COUNT(*) OVER() AS total_count
+             FROM departments d
+             WHERE (@search IS NULL OR d.name ILIKE @search)
+                 AND d.deleted_at IS NULL
+                 AND d.is_active = TRUE
+             {orderByClause}
+             LIMIT @limit OFFSET @offset;
+             """,
             param: parameters);
 
         var totalCount = departments.FirstOrDefault()?.TotalCount ?? 0;
 
         var responseItems = departments.Select(d => new GetDepartmentsResponseItemDto
         {
-            Id = d.Id,
-            Name = d.Name,
-            Path = d.Path,
-            CreatedAt = d.CreatedAt,
+            Id = d.Id, Name = d.Name, Path = d.Path, CreatedAt = d.CreatedAt,
         }).ToList();
 
         return new PagedResult<GetDepartmentsResponseItemDto>(
