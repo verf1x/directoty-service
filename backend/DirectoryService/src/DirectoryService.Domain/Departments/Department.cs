@@ -123,7 +123,8 @@ public sealed class Department
     public void SoftDelete()
     {
         IsActive = false;
-        Identifier = Identifier.Create($"deleted-{Identifier}").Value;
+        Identifier = Identifier.Create($"deleted-{Identifier.Value}").Value;
+        Path = Path.Create(GetDeletedPathValue()).Value;
         DeletedAt = DateTime.UtcNow;
         UpdatedAt = DateTime.UtcNow;
     }
@@ -134,5 +135,22 @@ public sealed class Department
         Identifier = Identifier.Create(Identifier.Value.Replace("deleted-", string.Empty)).Value;
         DeletedAt = null;
         UpdatedAt = DateTime.UtcNow;
+    }
+
+    private string GetDeletedPathValue()
+    {
+        const string deletedPrefix = "deleted_";
+
+        var pathParts = Path.Value.Split('.');
+        var lastPart = pathParts[^1];
+
+        if (lastPart.StartsWith(deletedPrefix, StringComparison.Ordinal))
+        {
+            return Path.Value;
+        }
+
+        pathParts[^1] = $"{deletedPrefix}{lastPart}";
+
+        return string.Join('.', pathParts);
     }
 }

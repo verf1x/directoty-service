@@ -62,4 +62,8 @@ public interface IDepartmentsRepository
         Department department,
         short oldDepth,
         Path oldPath);
+
+    Task<UnitResult<ErrorList>> UpdateDescendantsPathAsync(
+        Path oldPath,
+        Path newPath);
 }

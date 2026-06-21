@@ -308,4 +308,36 @@ public class DepartmentsRepository : IDepartmentsRepository
 
         return UnitResult.Success<ErrorList>();
     }
+
+    public async Task<UnitResult<ErrorList>> UpdateDescendantsPathAsync(
+        Path oldPath,
+        Path newPath)
+    {
+        var dbConnection = _dbContext.Database.GetDbConnection();
+
+        try
+        {
+            await dbConnection.ExecuteAsync(
+                """
+                UPDATE departments
+                SET path = @NewPath::ltree || subpath(path, nlevel(@OldPath::ltree))
+                WHERE path <@ @OldPath::ltree
+                AND path != @OldPath::ltree
+                """,
+                new
+                {
+                    OldPath = oldPath.Value,
+                    NewPath = newPath.Value,
+                });
+        }
+        catch (Exception)
+        {
+            return Error.Failure(
+                    "update.descendants.path.failed",
+                    "Failed to update descendants path.")
+                .ToErrors();
+        }
+
+        return UnitResult.Success<ErrorList>();
+    }
 }

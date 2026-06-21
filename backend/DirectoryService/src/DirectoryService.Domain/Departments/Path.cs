@@ -12,7 +12,7 @@ public sealed class Path : ComparableValueObject
 
     public static Result<Path, Error> Create(string value)
     {
-        var pattern = new Regex(@"^[a-z]+(?:-[a-z]+)*(?:\.[a-z]+(?:-[a-z]+)*)*$");
+        var pattern = new Regex(@"^[a-z]+(?:[-_][a-z]+)*(?:\.[a-z]+(?:[-_][a-z]+)*)*$");
 
         if (string.IsNullOrWhiteSpace(value) || !pattern.IsMatch(value))
             return Errors.General.ValueIsInvalid(nameof(value));

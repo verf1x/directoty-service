@@ -18,7 +18,9 @@ public class SoftDeleteDepartmentHandler(
         SoftDeleteDepartmentCommand command,
         CancellationToken cancellationToken)
     {
-        var departmentResult = await departmentsRepository.GetByAsync(d => d.Id == command.Id, cancellationToken);
+        var departmentResult = await departmentsRepository.GetByAsync(
+            d => d.Id == command.Id && d.IsActive,
+            cancellationToken);
 
         if (departmentResult.IsFailure)
         {
@@ -26,13 +28,15 @@ public class SoftDeleteDepartmentHandler(
         }
 
         var department = departmentResult.Value;
-
-        if (!department.IsActive)
-        {
-            return department.Id.Value;
-        }
+        var oldPath = department.Path;
 
         department.SoftDelete();
+
+        var updateDescendantsResult = await departmentsRepository.UpdateDescendantsPathAsync(oldPath, department.Path);
+        if (updateDescendantsResult.IsFailure)
+        {
+            return updateDescendantsResult.Error;
+        }
 
         await DeactivateOrphanLocationsAsync(department.Id, cancellationToken);
         await DeactivateOrphanPositionsAsync(department.Id, cancellationToken);
