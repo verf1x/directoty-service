@@ -64,6 +64,7 @@ public class GetLocationsHandler(
                                              l.apartment,
                                              l.time_zone,
                                              l.created_at,
+                                             l.is_active,
                                              COUNT(dl.department_id) AS departments_count
                                       FROM locations l
                                                LEFT JOIN department_locations dl ON l.id = dl.location_id
@@ -84,6 +85,7 @@ public class GetLocationsHandler(
                  building,
                  apartment,
                  time_zone,
+                 is_active,
                  created_at,
                  departments_count,
                  COUNT(*) OVER () AS total_count
