@@ -56,11 +56,11 @@ public class SoftDeletePositionHandler(
             """
             SELECT EXISTS(
                 SELECT 1
-                FROM departments_positions dp
+                FROM department_positions dp
                 JOIN departments d ON dp.department_id = d.id
                 WHERE dp.position_id = @PositionId 
                 AND d.is_active = true
-                AND dp.deleted_at IS NULL
+                AND d.deleted_at IS NULL
             )
             """,
             new { PositionId = position.Id.Value });

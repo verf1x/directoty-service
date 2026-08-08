@@ -1,5 +1,6 @@
 ﻿using DirectoryService.Application.Abstractions;
 using DirectoryService.Application.Positions.Create;
+using DirectoryService.Application.Positions.GetById;
 using DirectoryService.Application.Positions.SoftDelete;
 using DirectoryService.Contracts.Positions;
 using DirectoryService.Domain.Shared;
@@ -12,6 +13,19 @@ namespace DirectoryService.Presentation.Controllers;
 [Route("api/positions")]
 public class PositionsController : ControllerBase
 {
+    [HttpGet("{id}")]
+    [ProducesResponseType<Envelope<Guid>>(200)]
+    [ProducesResponseType<Envelope>(404)]
+    public async Task<EndpointResult<GetPositionResponse>> GetByIdAsync(
+        [FromRoute] Guid id,
+        [FromServices] IQueryHandler<GetPositionByIdQuery, GetPositionResponse> handler,
+        CancellationToken cancellationToken)
+    {
+        var query = new GetPositionByIdQuery(id);
+
+        return await handler.HandleAsync(query, cancellationToken);
+    }
+
     [HttpPost]
     [ProducesResponseType<Envelope<Guid>>(200)]
     [ProducesResponseType<Envelope>(400)]

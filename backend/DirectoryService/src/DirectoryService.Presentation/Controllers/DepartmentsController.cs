@@ -1,6 +1,7 @@
 ﻿using DirectoryService.Application.Abstractions;
 using DirectoryService.Application.Departments.Create;
 using DirectoryService.Application.Departments.Get;
+using DirectoryService.Application.Departments.GetById;
 using DirectoryService.Application.Departments.SoftDelete;
 using DirectoryService.Application.Departments.UpdateLocations;
 using DirectoryService.Application.Departments.UpdateParent;
@@ -29,6 +30,19 @@ public sealed class DepartmentsController : ControllerBase
             request.SortBy,
             request.SortDirection,
             request.Pagination);
+
+        return await handler.HandleAsync(query, cancellationToken);
+    }
+
+    [HttpGet("{id}")]
+    [ProducesResponseType<Envelope<Guid>>(200)]
+    [ProducesResponseType<Envelope>(404)]
+    public async Task<EndpointResult<GetDepartmentResponse>> GetByIdAsync(
+        [FromRoute] Guid id,
+        [FromServices] IQueryHandler<GetDepartmentByIdQuery, GetDepartmentResponse> handler,
+        CancellationToken cancellationToken)
+    {
+        var query = new GetDepartmentByIdQuery(id);
 
         return await handler.HandleAsync(query, cancellationToken);
     }

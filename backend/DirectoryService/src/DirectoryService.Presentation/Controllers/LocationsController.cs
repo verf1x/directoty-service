@@ -1,6 +1,7 @@
 ﻿using DirectoryService.Application.Abstractions;
 using DirectoryService.Application.Locations.Create;
 using DirectoryService.Application.Locations.Get;
+using DirectoryService.Application.Locations.GetById;
 using DirectoryService.Application.Locations.GetTop;
 using DirectoryService.Application.Locations.SoftDelete;
 using DirectoryService.Contracts;
@@ -15,6 +16,19 @@ namespace DirectoryService.Presentation.Controllers;
 [Route("api/locations")]
 public sealed class LocationsController : ControllerBase
 {
+    [HttpGet("{id}")]
+    [ProducesResponseType<Envelope<Guid>>(200)]
+    [ProducesResponseType<Envelope>(404)]
+    public async Task<EndpointResult<GetLocationResponse>> GetAsync(
+        [FromRoute] Guid id,
+        [FromServices] IQueryHandler<GetLocationByIdQuery, GetLocationResponse> handler,
+        CancellationToken cancellationToken)
+    {
+        var query = new GetLocationByIdQuery(id);
+
+        return await handler.HandleAsync(query, cancellationToken);
+    }
+
     [HttpPost]
     [ProducesResponseType<Envelope<Guid>>(200)]
     [ProducesResponseType<Envelope>(400)]
