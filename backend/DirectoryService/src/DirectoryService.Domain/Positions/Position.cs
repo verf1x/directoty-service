@@ -15,7 +15,7 @@ public sealed class Position
         Id = id;
         Name = name;
         Description = description;
-        _departmentPositions = departmentPositions.ToList();
+        _departmentPositions = [.. departmentPositions];
         IsActive = true;
         CreatedAt = DateTime.UtcNow;
     }

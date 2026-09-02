@@ -7,14 +7,14 @@ using DirectoryService.Domain.Shared;
 
 namespace DirectoryService.Application.Locations.GetTop;
 
-public class GetTopLocationsHandler(IDbConnectionFactory dbConnectionFactory)
+public class GetTopLocationsHandler(IReadDbConnectionFactory readDbConnectionFactory)
     : IQueryHandler<GetTopLocationsQuery, GetTopLocationsResponse>
 {
     public async Task<Result<GetTopLocationsResponse, ErrorList>> HandleAsync(
         GetTopLocationsQuery query,
         CancellationToken cancellationToken = default)
     {
-        using var dbConnection = await dbConnectionFactory.CreateConnectionAsync(cancellationToken);
+        using var dbConnection = await readDbConnectionFactory.CreateConnectionAsync(cancellationToken);
 
         var topLocations = await dbConnection.QueryAsync<TopLocationDto>(
             """
@@ -29,10 +29,8 @@ public class GetTopLocationsHandler(IDbConnectionFactory dbConnectionFactory)
                    l.building,
                    l.apartment,
                    COUNT(dl.department_id) AS departments_count
-            FROM locations l
+            FROM available.locations l
                      LEFT JOIN department_locations dl ON l.id = dl.location_id
-            WHERE l.is_active = TRUE
-              AND l.deleted_at IS NULL
             GROUP BY l.id
             ORDER BY departments_count DESC
             LIMIT 5

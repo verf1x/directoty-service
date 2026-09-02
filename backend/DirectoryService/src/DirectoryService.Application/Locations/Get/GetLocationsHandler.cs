@@ -13,7 +13,8 @@ namespace DirectoryService.Application.Locations.Get;
 
 public class GetLocationsHandler(
     IValidator<GetLocationsQuery> validator,
-    IDbConnectionFactory dbConnectionFactory) : IQueryHandler<GetLocationsQuery, PagedResult<LocationListItemDto>>
+    IReadDbConnectionFactory readDbConnectionFactory)
+    : IQueryHandler<GetLocationsQuery, PagedResult<LocationListItemDto>>
 {
     public async Task<Result<PagedResult<LocationListItemDto>, ErrorList>> HandleAsync(
         GetLocationsQuery query,
@@ -47,7 +48,7 @@ public class GetLocationsHandler(
         var orderByClause = $"ORDER BY {sortBy} {sortDirection}";
 
 
-        using var connection = await dbConnectionFactory.CreateConnectionAsync(cancellationToken);
+        using var connection = await readDbConnectionFactory.CreateConnectionAsync(cancellationToken);
 
 
         var rows = (await connection.QueryAsync<LocationListRow>(
@@ -66,11 +67,9 @@ public class GetLocationsHandler(
                                              l.created_at,
                                              l.is_active,
                                              COUNT(dl.department_id) AS departments_count
-                                      FROM locations l
+                                      FROM available.locations l
                                                LEFT JOIN department_locations dl ON l.id = dl.location_id
                                       WHERE (@search IS NULL OR l.name ILIKE @search)
-                                      AND l.deleted_at IS NULL
-                                      AND is_active = TRUE
                                       GROUP BY l.id)
 
              SELECT 

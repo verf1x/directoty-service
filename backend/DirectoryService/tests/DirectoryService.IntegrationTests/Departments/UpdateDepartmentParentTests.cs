@@ -4,17 +4,13 @@ using DirectoryService.Application.Departments.UpdateParent;
 using DirectoryService.Domain.Departments;
 using DirectoryService.Domain.Shared;
 using DirectoryService.IntegrationTests.Fakers;
+using DirectoryService.IntegrationTests.Infrastructure;
 using Microsoft.EntityFrameworkCore;
 
 namespace DirectoryService.IntegrationTests.Departments;
 
-public class UpdateDepartmentParentTests : BaseIntegrationTest
+public class UpdateDepartmentParentTests(DirectoryServiceTestsWebFactory webFactory) : BaseIntegrationTest(webFactory)
 {
-    public UpdateDepartmentParentTests(DirectoryServiceTestsWebFactory webFactory)
-        : base(webFactory)
-    {
-    }
-
     [Fact]
     public async Task UpdateParent_WithValidParent_ShouldBeSucceed()
     {

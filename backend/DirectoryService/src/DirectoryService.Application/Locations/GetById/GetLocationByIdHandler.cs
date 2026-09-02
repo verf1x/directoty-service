@@ -9,31 +9,22 @@ using FluentValidation;
 
 namespace DirectoryService.Application.Locations.GetById;
 
-public class GetLocationByIdHandler : IQueryHandler<GetLocationByIdQuery, GetLocationResponse>
+public class GetLocationByIdHandler(
+    IValidator<GetLocationByIdQuery> validator,
+    IReadDbConnectionFactory readDbConnectionFactory) : IQueryHandler<GetLocationByIdQuery, GetLocationResponse>
 {
-    private readonly IValidator<GetLocationByIdQuery> _validator;
-    private readonly IDbConnectionFactory _dbConnectionFactory;
-
-    public GetLocationByIdHandler(
-        IValidator<GetLocationByIdQuery> validator,
-        IDbConnectionFactory dbConnectionFactory)
-    {
-        _validator = validator;
-        _dbConnectionFactory = dbConnectionFactory;
-    }
-
     public async Task<Result<GetLocationResponse, ErrorList>> HandleAsync(
         GetLocationByIdQuery query,
         CancellationToken cancellationToken)
     {
-        var validationResult = await _validator.ValidateAsync(query, cancellationToken);
+        var validationResult = await validator.ValidateAsync(query, cancellationToken);
 
         if (!validationResult.IsValid)
         {
             return validationResult.ToErrors();
         }
 
-        using var connection = await _dbConnectionFactory.CreateConnectionAsync(cancellationToken);
+        using var connection = await readDbConnectionFactory.CreateConnectionAsync(cancellationToken);
 
         var location = await connection.QueryFirstOrDefaultAsync<GetLocationResponse>(
             """
@@ -50,10 +41,8 @@ public class GetLocationByIdHandler : IQueryHandler<GetLocationByIdQuery, GetLoc
                    time_zone,
                    created_at,
                    updated_at
-            FROM locations
+            FROM available.locations
             WHERE id = @Id
-              AND is_active = true
-              AND deleted_at IS NULL
             LIMIT 1;
             """,
             new { query.Id });

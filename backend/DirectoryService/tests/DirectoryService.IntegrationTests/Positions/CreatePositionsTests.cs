@@ -5,6 +5,7 @@ using DirectoryService.Application.Positions.Create;
 using DirectoryService.Domain.Positions;
 using DirectoryService.Domain.Shared;
 using DirectoryService.IntegrationTests.Fakers;
+using DirectoryService.IntegrationTests.Infrastructure;
 using Microsoft.EntityFrameworkCore;
 
 namespace DirectoryService.IntegrationTests.Positions;
@@ -204,8 +205,8 @@ public class CreatePositionsTests(DirectoryServiceTestsWebFactory webFactory) : 
             .Generate();
         var existingPositionResult = await CreatePosition(existingPositionCommand, cancellationToken);
         var duplicateNameCommand = CreatePositionCommandFakers
-            .Create([departmentId2])
-            .Generate() with
+                .Create([departmentId2])
+                .Generate() with
             {
                 Name = existingPositionCommand.Name,
             };

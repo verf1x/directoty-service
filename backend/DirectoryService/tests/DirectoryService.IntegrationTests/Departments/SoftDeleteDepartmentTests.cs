@@ -7,17 +7,13 @@ using DirectoryService.Domain.Locations;
 using DirectoryService.Domain.Positions;
 using DirectoryService.Domain.Shared;
 using DirectoryService.IntegrationTests.Fakers;
+using DirectoryService.IntegrationTests.Infrastructure;
 using Microsoft.EntityFrameworkCore;
 
 namespace DirectoryService.IntegrationTests.Departments;
 
-public class SoftDeleteDepartmentTests : BaseIntegrationTest
+public class SoftDeleteDepartmentTests(DirectoryServiceTestsWebFactory webFactory) : BaseIntegrationTest(webFactory)
 {
-    public SoftDeleteDepartmentTests(DirectoryServiceTestsWebFactory webFactory)
-        : base(webFactory)
-    {
-    }
-
     [Fact]
     public async Task SoftDelete_WithExclusiveLocationsAndPositions_DeactivatesDepartmentAndExclusiveRelationsOnly()
     {
@@ -26,7 +22,8 @@ public class SoftDeleteDepartmentTests : BaseIntegrationTest
         var exclusiveLocationId = await CreateLocation();
         var sharedLocationId = await CreateLocation();
 
-        var departmentId = await CreateDepartment([exclusiveLocationId.Value, sharedLocationId.Value], cancellationToken);
+        var departmentId =
+            await CreateDepartment([exclusiveLocationId.Value, sharedLocationId.Value], cancellationToken);
         var otherDepartmentId = await CreateDepartment([sharedLocationId.Value], cancellationToken);
 
         var exclusivePositionId = await CreatePosition([departmentId], cancellationToken);
@@ -105,11 +102,7 @@ public class SoftDeleteDepartmentTests : BaseIntegrationTest
             var grandChild = await dbContext.Departments
                 .FirstAsync(d => d.Id == DepartmentId.Create(grandChildId), cancellationToken);
 
-            return new
-            {
-                Child = child.Path.Value,
-                GrandChild = grandChild.Path.Value,
-            };
+            return new { Child = child.Path.Value, GrandChild = grandChild.Path.Value, };
         });
 
         // act

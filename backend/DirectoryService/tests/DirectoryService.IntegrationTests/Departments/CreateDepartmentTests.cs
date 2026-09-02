@@ -3,17 +3,13 @@ using DirectoryService.Application.Departments.Create;
 using DirectoryService.Domain.Departments;
 using DirectoryService.Domain.Shared;
 using DirectoryService.IntegrationTests.Fakers;
+using DirectoryService.IntegrationTests.Infrastructure;
 using Microsoft.EntityFrameworkCore;
 
 namespace DirectoryService.IntegrationTests.Departments;
 
-public class CreateDepartmentTests : BaseIntegrationTest
+public class CreateDepartmentTests(DirectoryServiceTestsWebFactory webFactory) : BaseIntegrationTest(webFactory)
 {
-    public CreateDepartmentTests(DirectoryServiceTestsWebFactory webFactory)
-        : base(webFactory)
-    {
-    }
-
     [Fact]
     public async Task CreateDepartment_WithValidData_ShouldBeSucceed()
     {

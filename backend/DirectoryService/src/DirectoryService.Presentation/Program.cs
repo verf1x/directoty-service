@@ -76,4 +76,7 @@ app.MapControllers();
 
 app.Run();
 
-public partial class Program;
+namespace DirectoryService.Presentation
+{
+    public partial class Program;
+}

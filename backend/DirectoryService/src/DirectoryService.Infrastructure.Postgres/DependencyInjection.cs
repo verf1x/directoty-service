@@ -1,4 +1,4 @@
-using DirectoryService.Application.Database;
+﻿using DirectoryService.Application.Database;
 using DirectoryService.Application.Departments;
 using DirectoryService.Application.Locations;
 using DirectoryService.Application.Positions;
@@ -37,6 +37,7 @@ public static class DependencyInjection
             });
 
             services.AddSingleton<IDbConnectionFactory, NpgSqlConnectionFactory>();
+            services.AddSingleton<IReadDbConnectionFactory, NpgSqlReadConnectionFactory>();
 
             services.AddScoped<ILocationsRepository, LocationsRepository>();
             services.AddScoped<IDepartmentsRepository, DepartmentsRepository>();

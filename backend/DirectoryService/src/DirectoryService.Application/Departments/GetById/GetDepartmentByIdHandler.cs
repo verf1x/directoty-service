@@ -16,10 +16,10 @@ public class GetDepartmentByIdHandler : IQueryHandler<GetDepartmentByIdQuery, Ge
 
     public GetDepartmentByIdHandler(
         IValidator<GetDepartmentByIdQuery> validator,
-        IDbConnectionFactory dbConnectionFactory)
+        IReadDbConnectionFactory readDbConnectionFactory)
     {
         _validator = validator;
-        _dbConnectionFactory = dbConnectionFactory;
+        _dbConnectionFactory = readDbConnectionFactory;
     }
 
     public async Task<Result<GetDepartmentResponse, ErrorList>> HandleAsync(
@@ -43,10 +43,8 @@ public class GetDepartmentByIdHandler : IQueryHandler<GetDepartmentByIdQuery, Ge
                    path,
                    created_at,
                    updated_at
-            FROM departments
+            FROM available.departments
             WHERE id = @Id
-              AND is_active = true
-              AND deleted_at IS NULL
             LIMIT 1;
             """,
             new { query.Id });

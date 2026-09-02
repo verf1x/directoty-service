@@ -4,17 +4,13 @@ using DirectoryService.Application.Departments.UpdateLocations;
 using DirectoryService.Domain.Departments;
 using DirectoryService.Domain.Shared;
 using DirectoryService.IntegrationTests.Fakers;
+using DirectoryService.IntegrationTests.Infrastructure;
 using Microsoft.EntityFrameworkCore;
 
 namespace DirectoryService.IntegrationTests.Departments;
 
-public class UpdateLocationsTests : BaseIntegrationTest
+public class UpdateLocationsTests(DirectoryServiceTestsWebFactory webFactory) : BaseIntegrationTest(webFactory)
 {
-    public UpdateLocationsTests(DirectoryServiceTestsWebFactory webFactory)
-        : base(webFactory)
-    {
-    }
-
     [Fact]
     public async Task UpdateLocations_WithValidLocation_ShouldBeSucceed()
     {

@@ -13,7 +13,7 @@ namespace DirectoryService.Application.Departments.Get;
 
 public class GetDepartmentsHandler(
     IValidator<GetDepartmentsQuery> validator,
-    IDbConnectionFactory dbConnectionFactory)
+    IReadDbConnectionFactory readDbConnectionFactory)
     : IQueryHandler<GetDepartmentsQuery, PagedResult<GetDepartmentsResponseItemDto>>
 {
     public async Task<Result<PagedResult<GetDepartmentsResponseItemDto>, ErrorList>> HandleAsync(
@@ -48,7 +48,7 @@ public class GetDepartmentsHandler(
 
         var orderByClause = $"ORDER BY {sortBy} {sortDirection}";
 
-        using var dbConnection = await dbConnectionFactory.CreateConnectionAsync(cancellationToken);
+        using var dbConnection = await readDbConnectionFactory.CreateConnectionAsync(cancellationToken);
 
         var departments = await dbConnection.QueryAsync<GetDepartmentsRow>(
             $"""
@@ -58,10 +58,8 @@ public class GetDepartmentsHandler(
                  d.path,
                  d.created_at,
                  COUNT(*) OVER() AS total_count
-             FROM departments d
+             FROM available.departments d
              WHERE (@search IS NULL OR d.name ILIKE @search)
-                 AND d.deleted_at IS NULL
-                 AND d.is_active = TRUE
              {orderByClause}
              LIMIT @limit OFFSET @offset;
              """,

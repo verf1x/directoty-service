@@ -3,6 +3,7 @@ using DirectoryService.Application.Locations.Create;
 using DirectoryService.Domain.Locations;
 using DirectoryService.Domain.Shared;
 using DirectoryService.IntegrationTests.Fakers;
+using DirectoryService.IntegrationTests.Infrastructure;
 using Microsoft.EntityFrameworkCore;
 
 namespace DirectoryService.IntegrationTests.Locations;
@@ -100,8 +101,8 @@ public class CreateLocationsTests(DirectoryServiceTestsWebFactory webFactory) : 
             .Generate();
         var existingLocationResult = await CreateLocation(existingLocationCommand, cancellationToken);
         var duplicateAddressCommand = CreateLocationCommandFakers
-            .Create()
-            .Generate() with
+                .Create()
+                .Generate() with
             {
                 PostalCode = existingLocationCommand.PostalCode,
                 Region = existingLocationCommand.Region,
@@ -149,8 +150,8 @@ public class CreateLocationsTests(DirectoryServiceTestsWebFactory webFactory) : 
             .Generate();
         var existingLocationResult = await CreateLocation(existingLocationCommand, cancellationToken);
         var duplicateNameCommand = CreateLocationCommandFakers
-            .Create()
-            .Generate() with
+                .Create()
+                .Generate() with
             {
                 Name = existingLocationCommand.Name,
             };

@@ -6,6 +6,7 @@ using DirectoryService.Contracts;
 using DirectoryService.Contracts.Locations;
 using DirectoryService.Domain.Shared;
 using DirectoryService.IntegrationTests.Fakers;
+using DirectoryService.IntegrationTests.Infrastructure;
 
 namespace DirectoryService.IntegrationTests.Locations;
 
@@ -166,8 +167,8 @@ public class GetLocationsTests(DirectoryServiceTestsWebFactory webFactory) : Bas
         var locationResult = await ExecuteHandler<CreateLocationHandler, Result<Guid, ErrorList>>(sut =>
         {
             var command = CreateLocationCommandFakers
-                .Create()
-                .Generate() with
+                    .Create()
+                    .Generate() with
                 {
                     Name = name,
                     PostalCode = NextPostalCode(),

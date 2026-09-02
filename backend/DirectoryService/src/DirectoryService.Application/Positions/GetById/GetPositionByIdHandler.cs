@@ -9,31 +9,23 @@ using FluentValidation;
 
 namespace DirectoryService.Application.Positions.GetById;
 
-public class GetPositionByIdHandler : IQueryHandler<GetPositionByIdQuery, GetPositionResponse>
+public class GetPositionByIdHandler(
+    IValidator<GetPositionByIdQuery> validator,
+    IReadDbConnectionFactory readDbConnectionFactory)
+    : IQueryHandler<GetPositionByIdQuery, GetPositionResponse>
 {
-    private readonly IValidator<GetPositionByIdQuery> _validator;
-    private readonly IDbConnectionFactory _dbConnectionFactory;
-
-    public GetPositionByIdHandler(
-        IValidator<GetPositionByIdQuery> validator,
-        IDbConnectionFactory dbConnectionFactory)
-    {
-        _validator = validator;
-        _dbConnectionFactory = dbConnectionFactory;
-    }
-
     public async Task<Result<GetPositionResponse, ErrorList>> HandleAsync(
         GetPositionByIdQuery query,
         CancellationToken cancellationToken)
     {
-        var validationResult = await _validator.ValidateAsync(query, cancellationToken);
+        var validationResult = await validator.ValidateAsync(query, cancellationToken);
 
         if (!validationResult.IsValid)
         {
             return validationResult.ToErrors();
         }
 
-        using var connection = await _dbConnectionFactory.CreateConnectionAsync(cancellationToken);
+        using var connection = await readDbConnectionFactory.CreateConnectionAsync(cancellationToken);
 
         var position = await connection.QueryFirstOrDefaultAsync<GetPositionResponse>(
             """
@@ -42,10 +34,8 @@ public class GetPositionByIdHandler : IQueryHandler<GetPositionByIdQuery, GetPos
                    description,
                    created_at,
                    updated_at
-            FROM positions
+            FROM available.positions
             WHERE id = @Id
-              AND is_active = true
-              AND deleted_at IS NULL
             LIMIT 1;
             """,
             new { query.Id });

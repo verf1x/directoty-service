@@ -5,6 +5,7 @@ using DirectoryService.Application.Locations.GetTop;
 using DirectoryService.Contracts.Locations;
 using DirectoryService.Domain.Shared;
 using DirectoryService.IntegrationTests.Fakers;
+using DirectoryService.IntegrationTests.Infrastructure;
 
 namespace DirectoryService.IntegrationTests.Locations;
 
@@ -85,8 +86,8 @@ public class GetTopLocationsTests(DirectoryServiceTestsWebFactory webFactory) : 
         var locationResult = await ExecuteHandler<CreateLocationHandler, Result<Guid, ErrorList>>(sut =>
         {
             var command = CreateLocationCommandFakers
-                .Create()
-                .Generate() with
+                    .Create()
+                    .Generate() with
                 {
                     Name = name,
                     PostalCode = NextPostalCode(),

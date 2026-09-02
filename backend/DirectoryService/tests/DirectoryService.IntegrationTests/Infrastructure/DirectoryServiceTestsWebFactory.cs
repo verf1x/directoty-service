@@ -1,6 +1,7 @@
 ﻿using System.Data.Common;
 using DirectoryService.Application.Database;
 using DirectoryService.Infrastructure.Postgres;
+using DirectoryService.Presentation;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.TestHost;
@@ -12,7 +13,7 @@ using Npgsql;
 using Respawn;
 using Testcontainers.PostgreSql;
 
-namespace DirectoryService.IntegrationTests;
+namespace DirectoryService.IntegrationTests.Infrastructure;
 
 public class DirectoryServiceTestsWebFactory : WebApplicationFactory<Program>, IAsyncLifetime
 {
@@ -75,8 +76,8 @@ public class DirectoryServiceTestsWebFactory : WebApplicationFactory<Program>, I
                 options.EnableDetailedErrors();
             });
 
-            sc.AddSingleton<IDbConnectionFactory>(
-                _ => new TestDbConnectionFactory(_dbContainer.GetConnectionString()));
+            sc.AddSingleton<IDbConnectionFactory>(_ =>
+                new TestDbConnectionFactory(_dbContainer.GetConnectionString()));
         });
     }
 

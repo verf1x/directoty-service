@@ -6,15 +6,15 @@ using Npgsql;
 
 namespace DirectoryService.Infrastructure.Postgres.Database;
 
-public class NpgSqlConnectionFactory : IDbConnectionFactory
+public class NpgSqlReadConnectionFactory : IReadDbConnectionFactory
 {
     private readonly NpgsqlDataSource _dataSource;
 
-    public NpgSqlConnectionFactory(IConfiguration configuration, ILoggerFactory loggerFactory)
+    public NpgSqlReadConnectionFactory(IConfiguration configuration, ILoggerFactory loggerFactory)
     {
-        string connectionString = configuration.GetConnectionString("DirectoryServiceDb")
+        string connectionString = configuration.GetConnectionString("DirectoryServiceReadDb")
                                   ?? throw new InvalidOperationException(
-                                      "Connection string 'DirectoryServiceDb' is not configured.");
+                                      "Connection string 'DirectoryServiceReadDb' is not configured.");
 
         var dataSourceBuilder = new NpgsqlDataSourceBuilder(connectionString);
         dataSourceBuilder
