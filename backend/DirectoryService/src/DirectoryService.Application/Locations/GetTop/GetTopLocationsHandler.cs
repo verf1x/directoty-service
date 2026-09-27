@@ -30,7 +30,7 @@ public class GetTopLocationsHandler(IReadDbConnectionFactory readDbConnectionFac
                    l.apartment,
                    COUNT(dl.department_id) AS departments_count
             FROM available.locations l
-                     LEFT JOIN department_locations dl ON l.id = dl.location_id
+                     LEFT JOIN available.department_locations dl ON l.id = dl.location_id
             GROUP BY l.id
             ORDER BY departments_count DESC
             LIMIT 5

@@ -60,11 +60,8 @@ public class SoftDeleteLocationHandler(
             """
             SELECT EXISTS(
                 SELECT 1
-                FROM department_locations dl
-                JOIN departments d ON dl.department_id = d.id
-                WHERE dl.location_id = @LocationId 
-                AND d.is_active
-                AND d.deleted_at IS NULL)
+                FROM available.department_locations dl
+                WHERE dl.location_id = @LocationId)
             """,
             new { LocationId = location.Id.Value });
     }

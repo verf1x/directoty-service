@@ -68,7 +68,7 @@ public class GetLocationsHandler(
                                              l.is_active,
                                              COUNT(dl.department_id) AS departments_count
                                       FROM available.locations l
-                                               LEFT JOIN department_locations dl ON l.id = dl.location_id
+                                               LEFT JOIN available.department_locations dl ON l.id = dl.location_id
                                       WHERE (@search IS NULL OR l.name ILIKE @search)
                                       GROUP BY l.id)
 
